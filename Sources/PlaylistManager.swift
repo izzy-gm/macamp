@@ -20,17 +20,33 @@ class PlaylistManager: ObservableObject {
     }
     
     func addTrack(_ track: Track) {
-        tracks.append(track)
-        if currentIndex == -1 {
-            playTrack(at: 0)
+        // Ensure this runs on main thread
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.tracks.append(track)
+            if self.currentIndex == -1 {
+                // Delay slightly to ensure UI updates complete
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self.playTrack(at: 0)
+                }
+            }
         }
     }
     
     func addTracks(_ newTracks: [Track]) {
-        let wasEmpty = tracks.isEmpty
-        tracks.append(contentsOf: newTracks)
-        if wasEmpty && !tracks.isEmpty {
-            playTrack(at: 0)
+        // Ensure this runs on main thread
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let wasEmpty = self.tracks.isEmpty
+            self.tracks.append(contentsOf: newTracks)
+            
+            // Only auto-play if playlist was empty
+            if wasEmpty && !self.tracks.isEmpty {
+                // Delay slightly to ensure UI updates complete
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self.playTrack(at: 0)
+                }
+            }
         }
     }
     
@@ -60,7 +76,11 @@ class PlaylistManager: ObservableObject {
         currentIndex = index
         let track = tracks[index]
         AudioPlayer.shared.loadTrack(track)
-        AudioPlayer.shared.play()
+        
+        // Wait a moment for track to load before playing (loadTrack is now async)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            AudioPlayer.shared.play()
+        }
     }
     
     func next() {
@@ -83,9 +103,14 @@ class PlaylistManager: ObservableObject {
         panel.allowedContentTypes = [.mp3, .init(filenameExtension: "flac")].compactMap { $0 }
         
         panel.begin { [weak self] response in
+            guard let self = self else { return }
             if response == .OK {
-                let newTracks = panel.urls.map { Track(url: $0) }
-                self?.addTracks(newTracks)
+                // Create tracks on background queue to avoid blocking
+                DispatchQueue.global(qos: .userInitiated).async {
+                    let newTracks = panel.urls.map { Track(url: $0) }
+                    // Add tracks on main queue
+                    self.addTracks(newTracks)
+                }
             }
         }
     }

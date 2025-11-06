@@ -18,6 +18,7 @@ class AudioPlayer: NSObject, ObservableObject {
     private var eqNode: AVAudioUnitEQ?
     private var timer: Timer?
     private var shouldAutoAdvance = true
+    private let audioQueue = DispatchQueue(label: "com.winamp.audio", qos: .userInteractive)
     
     override init() {
         super.init()
@@ -59,80 +60,128 @@ class AudioPlayer: NSObject, ObservableObject {
     }
     
     func loadTrack(_ track: Track) {
-        print("Loading track: \(track.title)")
+        print("=== Loading track: \(track.title) ===")
         
-        // Prevent auto-advance when manually loading a track
-        shouldAutoAdvance = false
-        
-        // Stop current playback and reset
-        playerNode?.stop()
-        playerNode?.reset()
-        stopTimer()
-        isPlaying = false
-        currentTime = 0
-        
-        currentTrack = track
-        
-        guard let url = track.url else { 
-            print("Track URL is nil")
-            return 
-        }
-        
-        do {
-            audioFile = try AVAudioFile(forReading: url)
-            duration = Double(audioFile!.length) / audioFile!.fileFormat.sampleRate
-            print("Track loaded successfully, duration: \(duration)")
-        } catch {
-            print("Failed to load audio file: \(error)")
-            audioFile = nil
+        // Execute on audio queue to ensure serialization
+        audioQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            // CRITICAL: Stop and cleanup everything first
+            DispatchQueue.main.async {
+                self.stopTimer()
+                self.isPlaying = false
+            }
+            
+            // Small delay to ensure timer is stopped
+            Thread.sleep(forTimeInterval: 0.02)
+            
+            // Completely destroy and recreate the player node to ensure clean state
+            if let player = self.playerNode, let engine = self.audioEngine, let _ = self.eqNode {
+                print("Destroying old player node")
+                engine.disconnectNodeOutput(player)
+                engine.detach(player)
+                player.stop()
+                player.reset()
+            }
+            
+            // Create a fresh player node
+            print("Creating fresh player node")
+            self.playerNode = AVAudioPlayerNode()
+            
+            // Reattach to engine
+            if let player = self.playerNode, let engine = self.audioEngine, let eq = self.eqNode {
+                engine.attach(player)
+                engine.connect(player, to: eq, format: nil)
+            }
+            
+            // Reset state on main thread
+            DispatchQueue.main.async {
+                self.currentTime = 0
+                self.shouldAutoAdvance = false
+                self.audioFile = nil
+                self.currentTrack = track
+            }
+            
+            guard let url = track.url else { 
+                print("Track URL is nil")
+                return 
+            }
+            
+            do {
+                let newFile = try AVAudioFile(forReading: url)
+                let newDuration = Double(newFile.length) / newFile.fileFormat.sampleRate
+                
+                DispatchQueue.main.async {
+                    self.audioFile = newFile
+                    self.duration = newDuration
+                }
+                print("Track loaded successfully, duration: \(newDuration)")
+            } catch {
+                print("Failed to load audio file: \(error)")
+                DispatchQueue.main.async {
+                    self.audioFile = nil
+                }
+            }
         }
     }
     
     func play() {
-        guard let player = playerNode,
-              let file = audioFile,
-              let engine = audioEngine else { 
-            print("Play failed: missing player, file, or engine")
-            return 
-        }
+        print("=== Play called ===")
         
-        // Restart engine if needed
-        if !engine.isRunning {
-            do {
-                try engine.start()
-                print("Engine started")
-            } catch {
-                print("Failed to start engine: \(error)")
+        // Execute on audio queue to ensure serialization
+        audioQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            guard let player = self.playerNode,
+                  let file = self.audioFile,
+                  let engine = self.audioEngine else { 
+                print("Play failed: missing player, file, or engine")
+                return 
+            }
+            
+            // If already playing, don't schedule again
+            if self.isPlaying {
+                print("Already playing, ignoring")
                 return
             }
-        }
-        
-        // If already playing, just resume
-        if isPlaying {
-            print("Already playing")
-            return
-        }
-        
-        // Stop and reset player node to clear any scheduled buffers
-        player.stop()
-        player.reset()
-        
-        // Re-enable auto-advance
-        shouldAutoAdvance = true
-        
-        // Schedule the entire file
-        player.scheduleFile(file, at: nil) { [weak self] in
-            DispatchQueue.main.async {
-                print("Track completed")
-                self?.handleTrackCompletion()
+            
+            // Restart engine if needed
+            if !engine.isRunning {
+                do {
+                    try engine.start()
+                    print("Engine started")
+                } catch {
+                    print("Failed to start engine: \(error)")
+                    return
+                }
             }
+            
+            // CRITICAL: Ensure player is completely stopped
+            print("Ensuring player is stopped and reset")
+            player.stop()
+            player.reset()
+            
+            // Re-enable auto-advance
+            self.shouldAutoAdvance = true
+            
+            // Schedule the entire file
+            print("Scheduling file for playback")
+            player.scheduleFile(file, at: nil) { [weak self] in
+                DispatchQueue.main.async {
+                    print("=== Track completed ===")
+                    self?.handleTrackCompletion()
+                }
+            }
+            
+            player.volume = self.volume
+            player.play()
+            
+            DispatchQueue.main.async {
+                self.isPlaying = true
+                self.startTimer()
+            }
+            print("=== Playback started successfully ===")
         }
-        
-        player.volume = volume
-        player.play()
-        isPlaying = true
-        startTimer()
-        print("Playback started")
     }
     
     func pause() {
