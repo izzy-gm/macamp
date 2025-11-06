@@ -55,6 +55,23 @@ struct MainPlayerView: View {
                     }
                     .frame(width: 185)
                     .background(Color.black)
+                    .overlay(
+                        // 3D inset effect - white highlight on top/left, dark shadow on bottom/right
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(
+                                LinearGradient(
+                                    colors: [
+                                        Color.white.opacity(0.3),
+                                        Color.white.opacity(0.15),
+                                        Color.clear,
+                                        Color.black.opacity(0.5)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 2
+                            )
+                    )
                     .cornerRadius(4)
                     
                     // RIGHT: Song info, bitrate, sliders, and buttons
@@ -144,11 +161,16 @@ struct MainPlayerView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color.black.opacity(0.6))
                             .overlay(
-                                // Inner shadow effect
+                                // Enhanced 3D inset effect - dark top/left, bright bottom/right
                                 RoundedRectangle(cornerRadius: 8)
                                     .strokeBorder(
                                         LinearGradient(
-                                            colors: [Color.black.opacity(0.8), Color.white.opacity(0.1)],
+                                            colors: [
+                                                Color.black.opacity(0.9),  // Dark shadow at top
+                                                Color.black.opacity(0.5),
+                                                Color.white.opacity(0.1),
+                                                Color.white.opacity(0.25)  // Bright highlight at bottom
+                                            ],
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         ),
@@ -170,15 +192,20 @@ struct MainPlayerView: View {
                             )
                             .frame(width: max(16, geo.size.width * CGFloat(audioPlayer.currentTime / max(audioPlayer.duration, 1))))
                             .overlay(
-                                // Raised bevel on progress fill
+                                // Enhanced raised bevel - bright white on top, dark shadow on bottom
                                 RoundedRectangle(cornerRadius: 7)
                                     .strokeBorder(
                                         LinearGradient(
-                                            colors: [Color.white.opacity(0.5), Color.black.opacity(0.3)],
+                                            colors: [
+                                                Color.white.opacity(0.7),   // Bright highlight at top
+                                                Color.white.opacity(0.3),
+                                                Color.black.opacity(0.2),
+                                                Color.black.opacity(0.5)    // Dark shadow at bottom
+                                            ],
                                             startPoint: .top,
                                             endPoint: .bottom
                                         ),
-                                        lineWidth: 1
+                                        lineWidth: 1.5
                                     )
                             )
                             .padding(2)
@@ -849,35 +876,34 @@ struct WinampButton: View {
                                 )
                             )
                         
-                        // 3D bevel effect
+                        // Enhanced 3D bevel effect
                         if !isPressed {
-                            // Top-left highlight (raised)
+                            // Enhanced raised bevel - bright on top, dark on bottom
                             RoundedRectangle(cornerRadius: 3)
                                 .strokeBorder(
                                     LinearGradient(
-                                        colors: [Color.white.opacity(0.4), Color.clear],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1.5
-                                )
-                            
-                            // Bottom-right shadow
-                            RoundedRectangle(cornerRadius: 3)
-                                .strokeBorder(
-                                    LinearGradient(
-                                        colors: [Color.clear, Color.black.opacity(0.6)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
+                                        colors: [
+                                            Color.white.opacity(0.6),   // Bright highlight at top
+                                            Color.white.opacity(0.3),
+                                            Color.black.opacity(0.2),
+                                            Color.black.opacity(0.6)    // Dark shadow at bottom
+                                        ],
+                                        startPoint: .top,
+                                        endPoint: .bottom
                                     ),
                                     lineWidth: 1.5
                                 )
                         } else {
-                            // Inverted bevel when pressed (inset)
+                            // Enhanced inset bevel when pressed - dark on top, bright on bottom
                             RoundedRectangle(cornerRadius: 3)
                                 .strokeBorder(
                                     LinearGradient(
-                                        colors: [Color.black.opacity(0.7), Color.white.opacity(0.15)],
+                                        colors: [
+                                            Color.black.opacity(0.9),   // Dark shadow at top
+                                            Color.black.opacity(0.5),
+                                            Color.white.opacity(0.1),
+                                            Color.white.opacity(0.3)    // Bright highlight at bottom
+                                        ],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     ),
@@ -1225,15 +1251,20 @@ struct ModernSlider: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
-                // Inset background track with 3D effect
+                // Inset background track with enhanced 3D effect
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color.black.opacity(0.6))
                     .overlay(
-                        // Inner shadow effect (top-left dark, bottom-right light)
+                        // Enhanced inner shadow effect - dark top/left, bright bottom/right
                         RoundedRectangle(cornerRadius: 10)
                             .strokeBorder(
                                 LinearGradient(
-                                    colors: [Color.black.opacity(0.8), Color.white.opacity(0.1)],
+                                    colors: [
+                                        Color.black.opacity(0.9),   // Dark shadow at top
+                                        Color.black.opacity(0.5),
+                                        Color.white.opacity(0.1),
+                                        Color.white.opacity(0.3)    // Bright highlight at bottom
+                                    ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
@@ -1241,7 +1272,7 @@ struct ModernSlider: View {
                             )
                     )
                 
-                // Progress fill with raised 3D effect
+                // Progress fill with enhanced raised 3D effect
                 RoundedRectangle(cornerRadius: 9)
                     .fill(
                         LinearGradient(
@@ -1255,14 +1286,20 @@ struct ModernSlider: View {
                     )
                     .frame(width: max(18, geometry.size.width * CGFloat((value - range.lowerBound) / (range.upperBound - range.lowerBound))))
                     .overlay(
+                        // Enhanced raised bevel - bright white on top, dark shadow on bottom
                         RoundedRectangle(cornerRadius: 9)
                             .strokeBorder(
                                 LinearGradient(
-                                    colors: [Color.white.opacity(0.4), Color.black.opacity(0.3)],
+                                    colors: [
+                                        Color.white.opacity(0.7),   // Bright highlight at top
+                                        Color.white.opacity(0.3),
+                                        Color.black.opacity(0.2),
+                                        Color.black.opacity(0.5)    // Dark shadow at bottom
+                                    ],
                                     startPoint: .top,
                                     endPoint: .bottom
                                 ),
-                                lineWidth: 1
+                                lineWidth: 1.5
                             )
                     )
                     .padding(2)
@@ -1318,30 +1355,40 @@ struct ModernToggleButtonWithLight: View {
             .background(
                 ZStack {
                     if isOn {
-                        // Raised button when active
+                        // Raised button when active - enhanced 3D
                         RoundedRectangle(cornerRadius: 3)
                             .fill(WinampColors.displayText)
                         
-                        // Top highlight
+                        // Enhanced raised bevel - bright on top, dark on bottom
                         RoundedRectangle(cornerRadius: 3)
                             .strokeBorder(
                                 LinearGradient(
-                                    colors: [Color.white.opacity(0.5), Color.clear],
+                                    colors: [
+                                        Color.white.opacity(0.7),   // Bright highlight at top
+                                        Color.white.opacity(0.3),
+                                        Color.black.opacity(0.2),
+                                        Color.black.opacity(0.4)    // Dark shadow at bottom
+                                    ],
                                     startPoint: .top,
                                     endPoint: .bottom
                                 ),
-                                lineWidth: 1
+                                lineWidth: 1.5
                             )
                     } else {
-                        // Inset button when inactive
+                        // Inset button when inactive - enhanced 3D
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color(red: 0.15, green: 0.17, blue: 0.22))
                         
-                        // Inner shadow effect
+                        // Enhanced inner shadow effect - dark top/left, bright bottom/right
                         RoundedRectangle(cornerRadius: 3)
                             .strokeBorder(
                                 LinearGradient(
-                                    colors: [Color.black.opacity(0.6), Color.white.opacity(0.1)],
+                                    colors: [
+                                        Color.black.opacity(0.8),   // Dark shadow at top
+                                        Color.black.opacity(0.4),
+                                        Color.white.opacity(0.1),
+                                        Color.white.opacity(0.3)    // Bright highlight at bottom
+                                    ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
