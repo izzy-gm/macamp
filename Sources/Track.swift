@@ -8,6 +8,11 @@ struct Track: Identifiable, Equatable {
     let artist: String
     let duration: TimeInterval
     let fileSize: Int64
+    var lyrics: [LyricLine]?
+    
+    static func == (lhs: Track, rhs: Track) -> Bool {
+        return lhs.id == rhs.id
+    }
     
     init(url: URL) {
         self.url = url
@@ -60,6 +65,16 @@ struct Track: Identifiable, Equatable {
         self.artist = trackArtist
         self.duration = trackDuration.isNaN ? 0 : trackDuration
         self.fileSize = fileSize
+        self.lyrics = nil // Will be loaded asynchronously
+    }
+    
+    mutating func loadLyrics() {
+        guard let url = self.url else { return }
+        
+        LyricsParser.loadLyrics(for: url, artist: self.artist, title: self.title, duration: self.duration) { [self] lyrics in
+            // Note: We can't mutate self in this closure since Track is a struct
+            // The lyrics will need to be managed separately or Track needs to be a class
+        }
     }
     
     private static func parseMetadataFromPath(_ url: URL) -> (title: String, artist: String) {

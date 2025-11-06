@@ -11,6 +11,8 @@ class AudioPlayer: NSObject, ObservableObject {
     @Published var volume: Float = 0.75
     @Published var currentTrack: Track?
     @Published var spectrumData: [Float] = Array(repeating: 0, count: 20)
+    @Published var currentLyrics: [LyricLine] = []
+    @Published var currentLyricText: String?
     
     private var audioEngine: AVAudioEngine?
     private var playerNode: AVAudioPlayerNode?
@@ -100,6 +102,17 @@ class AudioPlayer: NSObject, ObservableObject {
                 self.shouldAutoAdvance = false
                 self.audioFile = nil
                 self.currentTrack = track
+                self.currentLyrics = []
+                self.currentLyricText = nil
+            }
+            
+            // Load lyrics asynchronously
+            if let url = track.url {
+                LyricsParser.loadLyrics(for: url, artist: track.artist, title: track.title, duration: track.duration) { [weak self] lyrics in
+                    DispatchQueue.main.async {
+                        self?.currentLyrics = lyrics ?? []
+                    }
+                }
             }
             
             guard let url = track.url else { 
@@ -283,6 +296,23 @@ class AudioPlayer: NSObject, ObservableObject {
         
         let sampleRate = file.fileFormat.sampleRate
         currentTime = Double(playerTime.sampleTime) / sampleRate
+        
+        // Update current lyric based on playback time
+        updateCurrentLyric()
+    }
+    
+    private func updateCurrentLyric() {
+        guard !currentLyrics.isEmpty else {
+            if currentLyricText != nil {
+                currentLyricText = nil
+            }
+            return
+        }
+        
+        let newLyric = LyricsParser.getCurrentLyric(lyrics: currentLyrics, currentTime: currentTime)
+        if newLyric != currentLyricText {
+            currentLyricText = newLyric
+        }
     }
     
     private func updateSpectrum() {

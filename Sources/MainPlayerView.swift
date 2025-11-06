@@ -1368,6 +1368,7 @@ enum VisualizationPreset: Int, CaseIterable {
     case lfoMorph = 7
     case nebulaGalaxy = 8
     case starfieldFlight = 9
+    case starWarsCrawl = 10
     
     var name: String {
         switch self {
@@ -1617,6 +1618,7 @@ struct MilkdropCanvas: View {
         Canvas { context, size in
             drawVisualization(context: &context, size: size, time: time)
             drawTrackTitle(context: &context, size: size, time: time)
+            drawLyrics(context: &context, size: size, time: time)
             drawPresetChange(context: &context, size: size, time: time)
         }
     }
@@ -1824,6 +1826,34 @@ struct MilkdropCanvas: View {
         // Draw main text
         textContext.opacity = opacity
         textContext.draw(resolved, at: CGPoint(x: centerX, y: centerY), anchor: .center)
+    }
+    
+    private func drawLyrics(context: inout GraphicsContext, size: CGSize, time: Double) {
+        guard let lyricText = audioPlayer.currentLyricText, !lyricText.isEmpty else { return }
+        
+        // Position lyrics in lower third of screen
+        let yPosition = size.height * 0.75
+        
+        // Create the text with a nice style
+        let hue = (time * 0.05).truncatingRemainder(dividingBy: 1.0)
+        let textColor = Color(hue: hue, saturation: 0.8, brightness: 1.0)
+        
+        let text = Text(lyricText)
+            .font(.system(size: 32, weight: .semibold, design: .rounded))
+            .foregroundColor(textColor)
+        
+        let resolved = context.resolve(text)
+        
+        // Draw shadow/glow for better readability
+        for i in 0..<4 {
+            var glowContext = context
+            glowContext.opacity = 0.3 - Double(i) * 0.07
+            let offset = Double(i + 1) * 2.0
+            glowContext.draw(resolved, at: CGPoint(x: size.width / 2 + offset, y: yPosition + offset), anchor: .center)
+        }
+        
+        // Draw main text
+        context.draw(resolved, at: CGPoint(x: size.width / 2, y: yPosition), anchor: .center)
     }
     
     private func drawPresetChange(context: inout GraphicsContext, size: CGSize, time: Double) {

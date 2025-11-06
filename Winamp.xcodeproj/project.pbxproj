@@ -11,6 +11,7 @@
 		A10000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000002 /* ContentView.swift */; };
 		A10000003 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000003 /* AudioPlayer.swift */; };
 		A10000004 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000004 /* Track.swift */; };
+		A10000014 /* LyricsParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000014 /* LyricsParser.swift */; };
 		A10000005 /* PlaylistManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000005 /* PlaylistManager.swift */; };
 		A10000006 /* MainPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000006 /* MainPlayerView.swift */; };
 		A10000007 /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000007 /* PlaylistView.swift */; };
@@ -27,6 +28,7 @@
 		A20000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A20000003 /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		A20000004 /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		A20000014 /* LyricsParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsParser.swift; sourceTree = "<group>"; };
 		A20000005 /* PlaylistManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistManager.swift; sourceTree = "<group>"; };
 		A20000006 /* MainPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPlayerView.swift; sourceTree = "<group>"; };
 		A20000007 /* PlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistView.swift; sourceTree = "<group>"; };
@@ -65,6 +67,7 @@
 				A20000002 /* ContentView.swift */,
 				A20000003 /* AudioPlayer.swift */,
 				A20000004 /* Track.swift */,
+				A20000014 /* LyricsParser.swift */,
 				A20000005 /* PlaylistManager.swift */,
 				A20000006 /* MainPlayerView.swift */,
 				A20000007 /* PlaylistView.swift */,
@@ -161,6 +164,7 @@
 				A10000002 /* ContentView.swift in Sources */,
 				A10000003 /* AudioPlayer.swift in Sources */,
 				A10000004 /* Track.swift in Sources */,
+				A10000014 /* LyricsParser.swift in Sources */,
 				A10000005 /* PlaylistManager.swift in Sources */,
 				A10000006 /* MainPlayerView.swift in Sources */,
 				A10000007 /* PlaylistView.swift in Sources */,
