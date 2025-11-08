@@ -338,7 +338,7 @@ struct MainPlayerView: View {
                 .padding(.bottom, 6)
         }
         .frame(width: 450, height: 200)
-        .background(WinampColors.mainBgDark)
+        .background(WinampColors.mainBg)
     }
     
     private func formatTime(_ time: TimeInterval, showNegative: Bool = false) -> String {

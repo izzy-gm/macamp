@@ -13,6 +13,7 @@ struct PlaylistView: View {
     @State private var userInitiatedPlayback = false // Track if user clicked to play a song
     @State private var lastCurrentIndex = -1 // Track the last index to detect changes
     @State private var searchText = "" // Search filter text
+    @State private var isMinimized = false
     
     // Resizing state
     @Binding var playlistSize: CGSize
@@ -66,7 +67,16 @@ struct PlaylistView: View {
                 
                 Spacer()
                 
-                // No window controls - this is a sub-window
+                // Shade/minimize button
+                Button(action: {
+                    isMinimized.toggle()
+                }) {
+                    Image(systemName: isMinimized ? "chevron.down" : "chevron.up")
+                        .font(.system(size: 6, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(width: 9, height: 9)
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 5)
             .frame(height: 14)
@@ -78,8 +88,9 @@ struct PlaylistView: View {
                 )
             )
             
-            // Search box - with explicit interaction layer
-            ZStack {
+            if !isMinimized {
+                // Search box - with explicit interaction layer
+                ZStack {
                 // Background
                 Rectangle()
                     .fill(WinampColors.displayBg)
@@ -264,6 +275,7 @@ struct PlaylistView: View {
                 handleDrop(providers: providers)
                 return true
             }
+            }
             
             // Bottom control bar
             HStack(spacing: 0) {
@@ -301,8 +313,14 @@ struct PlaylistView: View {
                 
                 // Right side - buttons
                 HStack(spacing: 1) {
-                    PlaylistButton(text: "ADD") {
-                        playlistManager.showFilePicker()
+                    // ADD button with dropdown menu
+                    PlaylistMenuButton(text: "ADD") {
+                        Button("Add Files...") {
+                            playlistManager.showFilePicker()
+                        }
+                        Button("Add Folder...") {
+                            playlistManager.showFolderPicker()
+                        }
                     }
                     
                     PlaylistButton(text: "REM") {
@@ -325,15 +343,9 @@ struct PlaylistView: View {
                         }
                     }
                     
-                    Button(action: {
+                    PlaylistButton(text: "SAVE") {
                         playlistManager.saveM3UPlaylist()
-                    }) {
-                        Text("SAVE")
-                            .font(.system(size: 7, weight: .bold, design: .monospaced))
-                            .foregroundColor(.white)
-                            .frame(width: 30, height: 18)
                     }
-                    .buttonStyle(.plain)
                     
                     PlaylistButton(text: "CLR") {
                         playlistManager.clearPlaylist()
@@ -343,11 +355,13 @@ struct PlaylistView: View {
             .frame(height: 20)
             .background(WinampColors.mainBg)
             
-            // Resize handle at bottom edge
-            ResizeHandle(isDragging: $isDragging, playlistSize: $playlistSize)
+            // Resize handle at bottom edge (only when not minimized)
+            if !isMinimized {
+                ResizeHandle(isDragging: $isDragging, playlistSize: $playlistSize)
+            }
         }
         .background(WinampColors.mainBgDark)
-        .frame(width: playlistSize.width, height: playlistSize.height)
+        .frame(width: playlistSize.width, height: isMinimized ? 50 : playlistSize.height)
         .onAppear {
             // Load saved grouped/flat view preference
             if !hasLoadedGroupedState {
@@ -520,6 +534,59 @@ struct PlaylistButton: View {
     }
 }
 
+// Playlist menu button (looks like PlaylistButton but with dropdown menu)
+struct PlaylistMenuButton<Content: View>: View {
+    let text: String
+    let menuContent: Content
+    
+    init(text: String, @ViewBuilder menuContent: () -> Content) {
+        self.text = text
+        self.menuContent = menuContent()
+    }
+    
+    var body: some View {
+        Menu {
+            menuContent
+        } label: {
+            Text(text)
+                .font(.system(size: 7, weight: .bold, design: .monospaced))
+                .foregroundColor(.white)
+                .lineLimit(1)
+                .padding(.horizontal, 4)
+                .frame(height: 18)
+                .frame(minWidth: 30)
+                .background(
+                    ZStack {
+                        WinampColors.buttonFace
+                        
+                        // 3D border effect
+                        VStack(spacing: 0) {
+                            Rectangle()
+                                .fill(WinampColors.buttonLight)
+                                .frame(height: 1)
+                            Spacer()
+                            Rectangle()
+                                .fill(WinampColors.buttonDark)
+                                .frame(height: 1)
+                        }
+                        
+                        HStack(spacing: 0) {
+                            Rectangle()
+                                .fill(WinampColors.buttonLight)
+                                .frame(width: 1)
+                            Spacer()
+                            Rectangle()
+                                .fill(WinampColors.buttonDark)
+                                .frame(width: 1)
+                        }
+                    }
+                )
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+    }
+}
+
 // Artist folder header
 struct ArtistHeader: View {
     let artist: String
@@ -618,6 +685,7 @@ struct ResizeHandle: View {
     @Binding var isDragging: Bool
     @Binding var playlistSize: CGSize
     @State private var startSize: CGSize = .zero
+    @State private var isHovering = false
     
     var body: some View {
         ZStack {
@@ -656,19 +724,13 @@ struct ResizeHandle: View {
                     UserDefaults.standard.set(playlistSize.height, forKey: "playlistHeight")
                 }
         )
-        .cursor(NSCursor.resizeUpDown)
-    }
-}
-
-// Custom cursor modifier
-extension View {
-    func cursor(_ cursor: NSCursor) -> some View {
-        self.onContinuousHover { phase in
-            switch phase {
-            case .active:
-                cursor.push()
-            case .ended:
+        .onHover { hovering in
+            if hovering {
+                NSCursor.resizeUpDown.push()
+                isHovering = true
+            } else if isHovering {
                 NSCursor.pop()
+                isHovering = false
             }
         }
     }

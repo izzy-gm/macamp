@@ -26,13 +26,14 @@ struct ContentView: View {
                     } else {
                         MainPlayerView(showPlaylist: $showPlaylist, showEqualizer: $showEqualizer, isShadeMode: $isShadeMode, showVisualization: $showVisualization, shuffleEnabled: $shuffleEnabled, repeatEnabled: $repeatEnabled, songDisplayMode: $songDisplayMode, showRemainingTime: $showRemainingTime)
                         
-                        if showPlaylist {
-                            PlaylistView(playlistSize: $playlistSize)
-                        }
-                        
                         if showEqualizer {
                             EqualizerView()
                         }
+                    }
+                    
+                    // Playlist remains visible even when main player is in shade mode
+                    if showPlaylist {
+                        PlaylistView(playlistSize: $playlistSize)
                     }
                 }
                 .frame(width: 450)
