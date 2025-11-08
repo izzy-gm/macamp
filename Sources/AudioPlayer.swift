@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import Combine
+import MediaPlayer
 
 class AudioPlayer: NSObject, ObservableObject {
     static let shared = AudioPlayer()
@@ -25,6 +26,7 @@ class AudioPlayer: NSObject, ObservableObject {
     override init() {
         super.init()
         setupAudioEngine()
+        setupRemoteCommands()
     }
     
     private func setupAudioEngine() {
@@ -58,6 +60,68 @@ class AudioPlayer: NSObject, ObservableObject {
             try engine.start()
         } catch {
             print("Failed to start audio engine: \(error)")
+        }
+    }
+    
+    private func setupRemoteCommands() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+        // Play command
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.playCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            DispatchQueue.main.async {
+                if !self.isPlaying {
+                    if self.currentTime > 0 && self.audioFile != nil {
+                        self.resume()
+                    } else {
+                        self.play()
+                    }
+                }
+            }
+            return .success
+        }
+        
+        // Pause command
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.pauseCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            DispatchQueue.main.async {
+                if self.isPlaying {
+                    self.pause()
+                }
+            }
+            return .success
+        }
+        
+        // Toggle play/pause command
+        commandCenter.togglePlayPauseCommand.isEnabled = true
+        commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            DispatchQueue.main.async {
+                self.togglePlayPause()
+            }
+            return .success
+        }
+        
+        // Next track command
+        commandCenter.nextTrackCommand.isEnabled = true
+        commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            DispatchQueue.main.async {
+                PlaylistManager.shared.next()
+            }
+            return .success
+        }
+        
+        // Previous track command
+        commandCenter.previousTrackCommand.isEnabled = true
+        commandCenter.previousTrackCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            DispatchQueue.main.async {
+                PlaylistManager.shared.previous()
+            }
+            return .success
         }
     }
     
@@ -126,6 +190,7 @@ class AudioPlayer: NSObject, ObservableObject {
                 DispatchQueue.main.async {
                     self.audioFile = newFile
                     self.duration = newDuration
+                    self.updateNowPlayingInfo()
                 }
                 print("Track loaded successfully, duration: \(newDuration)")
             } catch {
@@ -135,6 +200,22 @@ class AudioPlayer: NSObject, ObservableObject {
                 }
             }
         }
+    }
+    
+    private func updateNowPlayingInfo() {
+        guard let track = currentTrack else {
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+            return
+        }
+        
+        var nowPlayingInfo = [String: Any]()
+        nowPlayingInfo[MPMediaItemPropertyTitle] = track.title
+        nowPlayingInfo[MPMediaItemPropertyArtist] = track.artist
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? 1.0 : 0.0
+        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
     
     func play() {
@@ -191,6 +272,7 @@ class AudioPlayer: NSObject, ObservableObject {
             DispatchQueue.main.async {
                 self.isPlaying = true
                 self.startTimer()
+                self.updateNowPlayingInfo()
             }
             print("=== Playback started successfully ===")
         }
@@ -202,6 +284,7 @@ class AudioPlayer: NSObject, ObservableObject {
         playerNode?.pause()
         isPlaying = false
         stopTimer()
+        updateNowPlayingInfo()
     }
     
     func resume() {
@@ -210,6 +293,7 @@ class AudioPlayer: NSObject, ObservableObject {
         player.play()
         isPlaying = true
         startTimer()
+        updateNowPlayingInfo()
     }
     
     func stop() {
@@ -218,6 +302,7 @@ class AudioPlayer: NSObject, ObservableObject {
         isPlaying = false
         currentTime = 0
         stopTimer()
+        updateNowPlayingInfo()
     }
     
     func togglePlayPause() {
