@@ -9,6 +9,7 @@ class PlaylistManager: ObservableObject {
     @Published var currentIndex: Int = -1
     
     private var cancellables = Set<AnyCancellable>()
+    private var isLoadingTrack = false
     
     init() {
         // No automatic playback on index change to prevent feedback loops
@@ -73,7 +74,9 @@ class PlaylistManager: ObservableObject {
     
     func playTrack(at index: Int) {
         guard index >= 0 && index < tracks.count else { return }
+        guard !isLoadingTrack else { return } // Prevent concurrent track loads
         
+        isLoadingTrack = true
         currentIndex = index
         let track = tracks[index]
         AudioPlayer.shared.loadTrack(track)
@@ -81,6 +84,7 @@ class PlaylistManager: ObservableObject {
         // Wait a moment for track to load before playing (loadTrack is now async)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
             AudioPlayer.shared.play()
+            self.isLoadingTrack = false
         }
     }
     

@@ -31,6 +31,7 @@ struct WinampColors {
     static let playlistText = Color(red: 0, green: 1.0, blue: 0.5)
     static let playlistSelected = Color(red: 0, green: 0.4, blue: 0.2)
     static let playlistCurrentTrack = Color(red: 0, green: 0.9, blue: 0.45)
+    static let playlistCurrentTrackBg = Color(red: 0.1, green: 0.2, blue: 0.5) // Dark blue background for playing track
     
     // Equalizer colors
     static let eqSliderBg = Color(red: 20/255, green: 25/255, blue: 35/255)

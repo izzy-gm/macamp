@@ -6,10 +6,13 @@ struct PlaylistView: View {
     @EnvironmentObject var audioPlayer: AudioPlayer
     @State private var selectedTrack: Track.ID?
     @State private var tapTimer: Timer?
-    @State private var tapCount = 0
+    @State private var lastTappedTrack: Track.ID?
     @State private var lastTrackCount = 0
     @State private var expandedArtists: Set<String> = []
     @State private var showGrouped = false // Default to flat view, loaded from UserDefaults on appear
+    @State private var userInitiatedPlayback = false // Track if user clicked to play a song
+    @State private var lastCurrentIndex = -1 // Track the last index to detect changes
+    @State private var searchText = "" // Search filter text
     
     // Resizing state
     @Binding var playlistSize: CGSize
@@ -17,11 +20,26 @@ struct PlaylistView: View {
     @State private var dragStart: CGPoint = .zero
     @State private var hasLoadedGroupedState = false
     
+    // Filter tracks based on search text
+    var filteredTracks: [(index: Int, track: Track)] {
+        if searchText.isEmpty {
+            return Array(playlistManager.tracks.enumerated().map { ($0.offset, $0.element) })
+        }
+        
+        let lowercasedSearch = searchText.lowercased()
+        return playlistManager.tracks.enumerated().compactMap { index, track in
+            let matchesTitle = track.title.lowercased().contains(lowercasedSearch)
+            let matchesArtist = track.artist.lowercased().contains(lowercasedSearch)
+            return (matchesTitle || matchesArtist) ? (index, track) : nil
+        }
+    }
+    
     // Group tracks by artist
     var groupedTracks: [(artist: String, tracks: [(index: Int, track: Track)])] {
         var artistDict: [String: [(Int, Track)]] = [:]
         
-        for (index, track) in playlistManager.tracks.enumerated() {
+        // Use filtered tracks instead of all tracks
+        for (index, track) in filteredTracks {
             let artist = track.artist
             if artistDict[artist] == nil {
                 artistDict[artist] = []
@@ -60,9 +78,43 @@ struct PlaylistView: View {
                 )
             )
             
+            // Search box - simplified approach
+            HStack(spacing: 4) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 8))
+                    .foregroundColor(WinampColors.displayText)
+                    .frame(width: 12)
+                
+                TextField("Search...", text: $searchText)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 9, design: .monospaced))
+                    .foregroundColor(WinampColors.displayText)
+                    .frame(height: 16)
+                
+                if !searchText.isEmpty {
+                    Button(action: {
+                        searchText = ""
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 8))
+                            .foregroundColor(WinampColors.displayText.opacity(0.6))
+                    }
+                    .buttonStyle(.plain)
+                    .frame(width: 12)
+                }
+            }
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(WinampColors.displayBg)
+            .overlay(
+                Rectangle()
+                    .stroke(WinampColors.borderDark, lineWidth: 1)
+            )
+            
             // Playlist content - flat or grouped
             ScrollViewReader { proxy in
                 ScrollView {
+                    Color.clear.frame(height: 0) // Ensure ScrollView doesn't overlap search box
                     LazyVStack(spacing: 0) {
                         if showGrouped {
                             // Grouped view by artist
@@ -82,12 +134,26 @@ struct PlaylistView: View {
                                 if expandedArtists.contains(group.artist) {
                                     ForEach(group.tracks, id: \.track.id) { indexedTrack in
                                         Button(action: {
-                                            // Single click action
-                                            selectedTrack = indexedTrack.track.id
+                                            let trackId = indexedTrack.track.id
+                                            let trackIndex = indexedTrack.index
                                             
-                                            // Check if already selected - if so, play it (double-click behavior)
-                                            if indexedTrack.track.id == selectedTrack {
-                                                playlistManager.playTrack(at: indexedTrack.index)
+                                            // Always select the track first
+                                            selectedTrack = trackId
+                                            
+                                            // Double-click detection
+                                            if lastTappedTrack == trackId, let timer = tapTimer, timer.isValid {
+                                                // This is a double-click on the same track
+                                                timer.invalidate()
+                                                lastTappedTrack = nil
+                                                userInitiatedPlayback = true
+                                                playlistManager.playTrack(at: trackIndex)
+                                            } else {
+                                                // First click - start timer
+                                                lastTappedTrack = trackId
+                                                tapTimer?.invalidate()
+                                                tapTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
+                                                    lastTappedTrack = nil
+                                                }
                                             }
                                         }) {
                                             ClassicPlaylistRow(
@@ -101,6 +167,7 @@ struct PlaylistView: View {
                                         .id(indexedTrack.track.id)
                                         .contextMenu {
                                             Button("Play") {
+                                                userInitiatedPlayback = true
                                                 playlistManager.playTrack(at: indexedTrack.index)
                                             }
                                             Button("Remove") {
@@ -111,32 +178,47 @@ struct PlaylistView: View {
                                 }
                             }
                         } else {
-                            // Flat view - all tracks
-                            ForEach(Array(playlistManager.tracks.enumerated()), id: \.element.id) { index, track in
+                            // Flat view - all tracks (filtered)
+                            ForEach(filteredTracks, id: \.track.id) { indexedTrack in
                                 Button(action: {
-                                    // Single click action
-                                    selectedTrack = track.id
+                                    let trackId = indexedTrack.track.id
+                                    let trackIndex = indexedTrack.index
                                     
-                                    // Check if already selected - if so, play it (double-click behavior)
-                                    if track.id == selectedTrack {
-                                        playlistManager.playTrack(at: index)
+                                    // Always select the track first
+                                    selectedTrack = trackId
+                                    
+                                    // Double-click detection
+                                    if lastTappedTrack == trackId, let timer = tapTimer, timer.isValid {
+                                        // This is a double-click on the same track
+                                        timer.invalidate()
+                                        lastTappedTrack = nil
+                                        userInitiatedPlayback = true
+                                        playlistManager.playTrack(at: trackIndex)
+                                    } else {
+                                        // First click - start timer
+                                        lastTappedTrack = trackId
+                                        tapTimer?.invalidate()
+                                        tapTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
+                                            lastTappedTrack = nil
+                                        }
                                     }
                                 }) {
                                     ClassicPlaylistRow(
-                                        track: track,
-                                        index: index + 1,
-                                        isPlaying: index == playlistManager.currentIndex,
-                                        isSelected: track.id == selectedTrack
+                                        track: indexedTrack.track,
+                                        index: indexedTrack.index + 1,
+                                        isPlaying: indexedTrack.index == playlistManager.currentIndex,
+                                        isSelected: indexedTrack.track.id == selectedTrack
                                     )
                                 }
                                 .buttonStyle(.plain)
-                                .id(track.id)
+                                .id(indexedTrack.track.id)
                                 .contextMenu {
                                     Button("Play") {
-                                        playlistManager.playTrack(at: index)
+                                        userInitiatedPlayback = true
+                                        playlistManager.playTrack(at: indexedTrack.index)
                                     }
                                     Button("Remove") {
-                                        playlistManager.removeTrack(at: index)
+                                        playlistManager.removeTrack(at: indexedTrack.index)
                                     }
                                 }
                             }
@@ -156,6 +238,16 @@ struct PlaylistView: View {
                         }
                     }
                     lastTrackCount = newCount
+                }
+                .onChange(of: playlistManager.currentIndex) { newIndex in
+                    // Only auto-scroll if the change wasn't user-initiated
+                    if !userInitiatedPlayback {
+                        // This is an automatic track change (next/previous/auto-advance)
+                        scrollToCurrentTrack(index: newIndex, proxy: proxy)
+                    }
+                    // Always reset the flag immediately after checking
+                    userInitiatedPlayback = false
+                    lastCurrentIndex = newIndex
                 }
             }
             .onDrop(of: [.fileURL], isTargeted: nil) { providers in
@@ -275,28 +367,35 @@ struct PlaylistView: View {
         }
     }
     
-    func handleTap(index: Int, trackId: Track.ID) {
-        tapCount += 1
-        print("🖱️ Tap count: \(tapCount) at index: \(index)")
+    func scrollToCurrentTrack(index: Int, proxy: ScrollViewProxy) {
+        // Ensure the index is valid
+        guard index >= 0 && index < playlistManager.tracks.count else { return }
         
-        if tapCount == 1 {
-            // First tap - wait to see if it's a double-click
-            print("🖱️ First tap - starting timer")
-            tapTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
-                print("🖱️ Timer fired - tapCount: \(self.tapCount)")
-                if self.tapCount == 1 {
-                    // Single click - just select
-                    print("🖱️ Single click detected - selecting track")
-                    self.selectedTrack = trackId
+        let currentTrack = playlistManager.tracks[index]
+        
+        // If in grouped view, expand the artist of the current track
+        if showGrouped {
+            let artist = currentTrack.artist
+            if !expandedArtists.contains(artist) {
+                // Expand the artist first
+                expandedArtists.insert(artist)
+                // Small delay to allow the UI to update before scrolling
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    withAnimation {
+                        proxy.scrollTo(currentTrack.id, anchor: .center)
+                    }
                 }
-                self.tapCount = 0
+            } else {
+                // Already expanded, just scroll
+                withAnimation {
+                    proxy.scrollTo(currentTrack.id, anchor: .center)
+                }
             }
-        } else if tapCount == 2 {
-            // Double-click - play immediately
-            print("🖱️ Double-click detected - playing track at index \(index)")
-            tapTimer?.invalidate()
-            playlistManager.playTrack(at: index)
-            tapCount = 0
+        } else {
+            // Flat view - just scroll to the track
+            withAnimation {
+                proxy.scrollTo(currentTrack.id, anchor: .center)
+            }
         }
     }
     
@@ -354,6 +453,7 @@ struct ClassicPlaylistRow: View {
         .padding(.vertical, 0)
         .frame(height: 12)
         .background(
+            isPlaying ? WinampColors.playlistCurrentTrackBg :
             isSelected ? WinampColors.playlistSelected : Color.clear
         )
     }
@@ -560,5 +660,3 @@ extension View {
         }
     }
 }
-
-
