@@ -33,9 +33,10 @@ struct WinampColors {
     static let playlistCurrentTrack = Color(red: 0, green: 0.9, blue: 0.45)
     static let playlistCurrentTrackBg = Color(red: 0.1, green: 0.2, blue: 0.5) // Dark blue background for playing track
     
-    // Equalizer colors
+    // Equalizer colors (classic Winamp orange/yellow gradient)
     static let eqSliderBg = Color(red: 20/255, green: 25/255, blue: 35/255)
-    static let eqSlider = Color(red: 0, green: 1.0, blue: 0.5)
+    static let eqSliderTop = Color(red: 1.0, green: 0.8, blue: 0.2) // Yellow at top
+    static let eqSliderBottom = Color(red: 1.0, green: 0.4, blue: 0.0) // Orange at bottom
     static let eqFrame = Color(red: 60/255, green: 65/255, blue: 80/255)
     
     // Spectrum/Visualizer

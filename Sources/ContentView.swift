@@ -32,7 +32,6 @@ struct ContentView: View {
                         
                         if showEqualizer {
                             EqualizerView()
-                                .frame(width: 450, height: 250)
                         }
                     }
                 }

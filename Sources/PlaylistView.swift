@@ -475,7 +475,10 @@ struct PlaylistButton: View {
             Text(text)
                 .font(.system(size: 7, weight: .bold, design: .monospaced))
                 .foregroundColor(.white)
-                .frame(width: 30, height: 18)
+                .lineLimit(1)
+                .padding(.horizontal, 4)
+                .frame(height: 18)
+                .frame(minWidth: 30)
                 .background(
                     ZStack {
                         isPressed ? WinampColors.buttonPressed : WinampColors.buttonFace
