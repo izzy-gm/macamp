@@ -7,6 +7,8 @@ struct MainPlayerView: View {
     @Binding var showEqualizer: Bool
     @Binding var isShadeMode: Bool
     @Binding var showVisualization: Bool
+    @Binding var shuffleEnabled: Bool
+    @Binding var repeatEnabled: Bool
     
     var body: some View {
         VStack(spacing: 0) {
@@ -248,62 +250,23 @@ struct MainPlayerView: View {
                     
                     // Shuffle and Repeat buttons
                     HStack(spacing: 2) {
-                        WinampButton(icon: "🔀", width: 60) { 
-                            // Shuffle toggle
-                        }
-                        WinampButton(icon: "🔁", width: 32) { 
-                            // Repeat toggle
-                        }
+                        WinampToggle(text: "SHUFFLE", isOn: $shuffleEnabled, width: 60)
+                        WinampToggle(text: "REPEAT", isOn: $repeatEnabled, width: 50)
                     }
                     
                     // Visualization toggle button with icon
                     Button(action: { showVisualization.toggle() }) {
                         ZStack {
-                            // Background with 3D effect
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(Color(red: 0.22, green: 0.25, blue: 0.32))
-                            
-                            // Recessed effect when active
-                            if showVisualization {
-                                // Dark inset shadow for recessed look
-                                RoundedRectangle(cornerRadius: 3)
-                                    .stroke(Color.black.opacity(0.5), lineWidth: 1)
-                                    .blur(radius: 1)
-                                    .offset(x: 1, y: 1)
-                                
-                                Rectangle()
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [
-                                                Color.black.opacity(0.3),
-                                                Color.clear
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
-                                    .cornerRadius(3)
-                            } else {
-                                // Raised effect when inactive (3D bevel)
-                                VStack(spacing: 0) {
-                                    Rectangle()
-                                        .fill(Color.white.opacity(0.15))
-                                        .frame(height: 1)
-                                    Spacer()
-                                    Rectangle()
-                                        .fill(Color.black.opacity(0.3))
-                                        .frame(height: 1)
-                                }
-                                .cornerRadius(3)
-                            }
-                            
                             // Winamp icon
                             Image("WinampIcon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 18, height: 18)
-                                .opacity(showVisualization ? 0.6 : 1.0)
+                                .opacity(showVisualization ? 0.8 : 1.0)
                                 .offset(x: showVisualization ? 1 : 0, y: showVisualization ? 1 : 0)
+                                .shadow(color: showVisualization ? Color.black.opacity(0.6) : Color.black.opacity(0.3), radius: showVisualization ? 2 : 0, x: showVisualization ? -1 : 0, y: showVisualization ? -1 : 0)
+                                .shadow(color: showVisualization ? Color.clear : Color.white.opacity(0.15), radius: showVisualization ? 0 : 1, x: showVisualization ? 0 : -1, y: showVisualization ? 0 : -1)
+                                .shadow(color: showVisualization ? Color.clear : Color.black.opacity(0.4), radius: showVisualization ? 0 : 1, x: showVisualization ? 0 : 1, y: showVisualization ? 0 : 1)
                         }
                         .frame(width: 32, height: 28)
                     }
@@ -931,31 +894,56 @@ struct WinampToggle: View {
     let text: String
     @Binding var isOn: Bool
     let width: CGFloat
-    @State private var isHovered = false
     
     var body: some View {
         Button(action: {
             isOn.toggle()
         }) {
-            Text(text)
-                .font(.system(size: 8, weight: .bold))
-                .foregroundColor(isOn ? WinampColors.displayText : .white.opacity(0.85))
-                .frame(width: width, height: 18)
-                .background(
+            ZStack(alignment: .topTrailing) {
+                // Button content
+                Text(text)
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundColor(.white.opacity(0.9))
+                    .frame(width: width, height: 18)
+                
+                // Indicator light in top-right corner
+                Rectangle()
+                    .fill(isOn ? WinampColors.displayText : Color.black)
+                    .frame(width: 5, height: 5)
+                    .shadow(color: isOn ? WinampColors.displayText : Color.clear, radius: 3, x: 0, y: 0)
+                    .offset(x: -3, y: 3)
+            }
+            .frame(width: width, height: 18)
+            .background(
+                ZStack {
+                    // Raised button style
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(isOn ? WinampColors.buttonPressed : 
-                              isHovered ? WinampColors.buttonHover : WinampColors.buttonFace)
-                        .shadow(color: .black.opacity(0.3), radius: isOn ? 0 : 1, x: 0, y: isOn ? 0 : 1)
-                )
-                .overlay(
+                        .fill(Color(red: 0.22, green: 0.25, blue: 0.32))
+                    
+                    // Raised bevel effect - bright top/left, dark bottom/right
                     RoundedRectangle(cornerRadius: 3)
-                        .strokeBorder(isOn ? WinampColors.displayText.opacity(0.5) : WinampColors.borderDark, lineWidth: 1)
-                )
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.4),
+                                    Color.white.opacity(0.2),
+                                    Color.black.opacity(0.2),
+                                    Color.black.opacity(0.5)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                }
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 3)
+                    .strokeBorder(Color.black.opacity(0.5), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.3), radius: 1, x: 0, y: 1)
         }
         .buttonStyle(.plain)
-        .onHover { hovering in
-            isHovered = hovering
-        }
     }
 }
 
@@ -1340,68 +1328,49 @@ struct ModernToggleButtonWithLight: View {
     
     var body: some View {
         Button(action: { isOn.toggle() }) {
-            VStack(spacing: 1) {
-                // Indicator light
-                Circle()
-                    .fill(isOn ? WinampColors.displayText : Color.black)
-                    .frame(width: 4, height: 4)
-                    .shadow(color: isOn ? WinampColors.displayText : Color.clear, radius: 2, x: 0, y: 0)
-                
+            ZStack(alignment: .topTrailing) {
+                // Button content
                 Text(text)
                     .font(.system(size: 8, weight: .bold))
-                    .foregroundColor(isOn ? .black : WinampColors.displayText)
+                    .foregroundColor(.white.opacity(0.9))
+                    .frame(width: 24, height: 20)
+                
+                // Indicator light in top-right corner
+                Rectangle()
+                    .fill(isOn ? WinampColors.displayText : Color.black)
+                    .frame(width: 5, height: 5)
+                    .shadow(color: isOn ? WinampColors.displayText : Color.clear, radius: 3, x: 0, y: 0)
+                    .offset(x: -3, y: 3)
             }
             .frame(width: 24, height: 20)
             .background(
                 ZStack {
-                    if isOn {
-                        // Raised button when active - enhanced 3D
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(WinampColors.displayText)
-                        
-                        // Enhanced raised bevel - bright on top, dark on bottom
-                        RoundedRectangle(cornerRadius: 3)
-                            .strokeBorder(
-                                LinearGradient(
-                                    colors: [
-                                        Color.white.opacity(0.7),   // Bright highlight at top
-                                        Color.white.opacity(0.3),
-                                        Color.black.opacity(0.2),
-                                        Color.black.opacity(0.4)    // Dark shadow at bottom
-                                    ],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                ),
-                                lineWidth: 1.5
-                            )
-                    } else {
-                        // Inset button when inactive - enhanced 3D
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(Color(red: 0.15, green: 0.17, blue: 0.22))
-                        
-                        // Enhanced inner shadow effect - dark top/left, bright bottom/right
-                        RoundedRectangle(cornerRadius: 3)
-                            .strokeBorder(
-                                LinearGradient(
-                                    colors: [
-                                        Color.black.opacity(0.8),   // Dark shadow at top
-                                        Color.black.opacity(0.4),
-                                        Color.white.opacity(0.1),
-                                        Color.white.opacity(0.3)    // Bright highlight at bottom
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1.5
-                            )
-                    }
+                    // Raised button style
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color(red: 0.22, green: 0.25, blue: 0.32))
+                    
+                    // Raised bevel effect - bright top/left, dark bottom/right
+                    RoundedRectangle(cornerRadius: 3)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.4),   // Bright highlight at top
+                                    Color.white.opacity(0.2),
+                                    Color.black.opacity(0.2),
+                                    Color.black.opacity(0.5)    // Dark shadow at bottom
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
                 }
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 3)
                     .strokeBorder(Color.black.opacity(0.5), lineWidth: 1)
             )
-            .shadow(color: isOn ? Color.black.opacity(0.3) : Color.clear, radius: 1, x: 0, y: 1)
+            .shadow(color: Color.black.opacity(0.3), radius: 1, x: 0, y: 1)
         }
         .buttonStyle(.plain)
     }
@@ -1443,8 +1412,10 @@ struct MilkdropVisualizerView: View {
     @EnvironmentObject var audioPlayer: AudioPlayer
     @EnvironmentObject var playlistManager: PlaylistManager
     @State private var trackChangeTime: Date = Date()
-    @State private var currentPreset: VisualizationPreset = .spiralGalaxy
+    @State private var currentPreset: VisualizationPreset = .kaleidoscope
     @State private var presetChangeTime: Date = Date()
+    @State private var autoChangeTimer: Timer?
+    @State private var fadeOpacity: Double = 1.0
     @Binding var isFullscreen: Bool
     
     var body: some View {
@@ -1508,6 +1479,7 @@ struct MilkdropVisualizerView: View {
                     presetChangeTime: presetChangeTime
                 )
             }
+            .opacity(fadeOpacity)
             .background(Color.black)
             .background(
                 DoubleClickHandler {
@@ -1520,6 +1492,12 @@ struct MilkdropVisualizerView: View {
         .background(FullscreenKeyHandler(isFullscreen: $isFullscreen, onToggle: toggleFullscreen))
         .onChange(of: playlistManager.currentTrack?.id) { _ in
             trackChangeTime = Date()
+        }
+        .onAppear {
+            startAutoChangeTimer()
+        }
+        .onDisappear {
+            stopAutoChangeTimer()
         }
     }
     
@@ -1562,19 +1540,51 @@ struct MilkdropVisualizerView: View {
     }
     
     private func nextPreset() {
-        let allPresets = VisualizationPreset.allCases
-        let currentIndex = allPresets.firstIndex(of: currentPreset) ?? 0
-        let nextIndex = (currentIndex + 1) % allPresets.count
-        currentPreset = allPresets[nextIndex]
-        presetChangeTime = Date()
+        // Manual preset change - restart timer
+        stopAutoChangeTimer()
+        changePresetWithFade(direction: 1)
+        startAutoChangeTimer()
     }
     
     private func previousPreset() {
-        let allPresets = VisualizationPreset.allCases
-        let currentIndex = allPresets.firstIndex(of: currentPreset) ?? 0
-        let prevIndex = (currentIndex - 1 + allPresets.count) % allPresets.count
-        currentPreset = allPresets[prevIndex]
-        presetChangeTime = Date()
+        // Manual preset change - restart timer
+        stopAutoChangeTimer()
+        changePresetWithFade(direction: -1)
+        startAutoChangeTimer()
+    }
+    
+    private func changePresetWithFade(direction: Int) {
+        // Fade out
+        withAnimation(.easeOut(duration: 0.5)) {
+            fadeOpacity = 0.0
+        }
+        
+        // Change preset after fade out
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            let allPresets = VisualizationPreset.allCases
+            let currentIndex = allPresets.firstIndex(of: currentPreset) ?? 0
+            let newIndex = (currentIndex + direction + allPresets.count) % allPresets.count
+            currentPreset = allPresets[newIndex]
+            presetChangeTime = Date()
+            
+            // Fade back in
+            withAnimation(.easeIn(duration: 0.5)) {
+                fadeOpacity = 1.0
+            }
+        }
+    }
+    
+    private func startAutoChangeTimer() {
+        // Auto-change preset every 2 minutes (120 seconds)
+        autoChangeTimer?.invalidate()
+        autoChangeTimer = Timer.scheduledTimer(withTimeInterval: 120.0, repeats: true) { [self] _ in
+            changePresetWithFade(direction: 1)
+        }
+    }
+    
+    private func stopAutoChangeTimer() {
+        autoChangeTimer?.invalidate()
+        autoChangeTimer = nil
     }
 }
 

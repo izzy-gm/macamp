@@ -11,6 +11,8 @@ struct ContentView: View {
     @State private var contentHeight: CGFloat = 450
     @State private var visualizerFullscreen = false
     @State private var playlistSize: CGSize = CGSize(width: 450, height: 250)
+    @State private var shuffleEnabled = false
+    @State private var repeatEnabled = false
     
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
@@ -20,7 +22,7 @@ struct ContentView: View {
                     if isShadeMode {
                         ShadeView(isShadeMode: $isShadeMode)
                     } else {
-                        MainPlayerView(showPlaylist: $showPlaylist, showEqualizer: $showEqualizer, isShadeMode: $isShadeMode, showVisualization: $showVisualization)
+                        MainPlayerView(showPlaylist: $showPlaylist, showEqualizer: $showEqualizer, isShadeMode: $isShadeMode, showVisualization: $showVisualization, shuffleEnabled: $shuffleEnabled, repeatEnabled: $repeatEnabled)
                         
                         if showPlaylist {
                             PlaylistView(playlistSize: $playlistSize)
