@@ -298,6 +298,7 @@ class AudioPlayer: NSObject, ObservableObject {
     
     func stop() {
         print("Stopping playback")
+        shouldAutoAdvance = false
         playerNode?.stop()
         isPlaying = false
         currentTime = 0

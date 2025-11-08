@@ -78,43 +78,52 @@ struct PlaylistView: View {
                 )
             )
             
-            // Search box - simplified approach
-            HStack(spacing: 4) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 8))
-                    .foregroundColor(WinampColors.displayText)
-                    .frame(width: 12)
-                
-                TextField("Search...", text: $searchText)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 9, design: .monospaced))
-                    .foregroundColor(WinampColors.displayText)
-                    .frame(height: 16)
-                
-                if !searchText.isEmpty {
-                    Button(action: {
-                        searchText = ""
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 8))
-                            .foregroundColor(WinampColors.displayText.opacity(0.6))
-                    }
-                    .buttonStyle(.plain)
-                    .frame(width: 12)
-                }
-            }
-            .padding(.horizontal, 6)
-            .padding(.vertical, 3)
-            .background(WinampColors.displayBg)
-            .overlay(
+            // Search box - with explicit interaction layer
+            ZStack {
+                // Background
                 Rectangle()
-                    .stroke(WinampColors.borderDark, lineWidth: 1)
-            )
+                    .fill(WinampColors.displayBg)
+                    .overlay(
+                        Rectangle()
+                            .stroke(WinampColors.borderDark, lineWidth: 1)
+                    )
+                
+                HStack(spacing: 4) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 8))
+                        .foregroundColor(WinampColors.displayText)
+                        .frame(width: 12)
+                    
+                    TextField("Search...", text: $searchText)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 9, design: .monospaced))
+                        .foregroundColor(WinampColors.displayText)
+                        .frame(height: 16)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.clear)
+                        .focusable(true)
+                    
+                    if !searchText.isEmpty {
+                        Button(action: {
+                            searchText = ""
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 8))
+                                .foregroundColor(WinampColors.displayText.opacity(0.6))
+                        }
+                        .buttonStyle(.plain)
+                        .frame(width: 12)
+                    }
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+            }
+            .frame(height: 22)
+            .zIndex(100) // Keep search box well above everything
             
             // Playlist content - flat or grouped
             ScrollViewReader { proxy in
                 ScrollView {
-                    Color.clear.frame(height: 0) // Ensure ScrollView doesn't overlap search box
                     LazyVStack(spacing: 0) {
                         if showGrouped {
                             // Grouped view by artist
@@ -250,6 +259,7 @@ struct PlaylistView: View {
                     lastCurrentIndex = newIndex
                 }
             }
+            .zIndex(0) // Ensure ScrollView is below search box
             .onDrop(of: [.fileURL], isTargeted: nil) { providers in
                 handleDrop(providers: providers)
                 return true

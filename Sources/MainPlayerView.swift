@@ -12,6 +12,9 @@ struct MainPlayerView: View {
     @Binding var songDisplayMode: DisplayMode
     @Binding var showRemainingTime: Bool
     
+    @State private var seekDragging = false
+    @State private var seekDragPercent: Double = 0
+    
     var body: some View {
         VStack(spacing: 0) {
             // Classic Winamp title bar with logo
@@ -96,26 +99,56 @@ struct MainPlayerView: View {
                         
                         // Bitrate and format info row
                         HStack(spacing: 4) {
-                            // Bitrate in green box
+                            // Bitrate display with recessed effect
                             Text("128")
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
-                                .foregroundColor(.black)
+                                .foregroundColor(WinampColors.displayText)
+                                .shadow(color: WinampColors.displayText.opacity(0.5), radius: 2, x: 0, y: 0)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(WinampColors.displayText)
+                                .background(Color.black)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .strokeBorder(
+                                            LinearGradient(
+                                                colors: [
+                                                    Color.black.opacity(0.8),
+                                                    Color.white.opacity(0.1)
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 1
+                                        )
+                                )
                                 .cornerRadius(3)
                             
                             Text("kbps")
                                 .font(.system(size: 9, weight: .medium))
                                 .foregroundColor(Color.white.opacity(0.7))
                             
-                            // Sample rate in green box
+                            // Sample rate display with recessed effect
                             Text("44")
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
-                                .foregroundColor(.black)
+                                .foregroundColor(WinampColors.displayText)
+                                .shadow(color: WinampColors.displayText.opacity(0.5), radius: 2, x: 0, y: 0)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(WinampColors.displayText)
+                                .background(Color.black)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .strokeBorder(
+                                            LinearGradient(
+                                                colors: [
+                                                    Color.black.opacity(0.8),
+                                                    Color.white.opacity(0.1)
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 1
+                                        )
+                                )
                                 .cornerRadius(3)
                             
                             Text("kHz")
@@ -197,7 +230,7 @@ struct MainPlayerView: View {
                                     endPoint: .bottom
                                 )
                             )
-                            .frame(width: max(16, geo.size.width * CGFloat(audioPlayer.currentTime / max(audioPlayer.duration, 1))))
+                            .frame(width: max(16, geo.size.width * CGFloat(seekDragging ? seekDragPercent : (audioPlayer.currentTime / max(audioPlayer.duration, 1)))))
                             .overlay(
                                 // Enhanced raised bevel - bright white on top, dark shadow on bottom
                                 RoundedRectangle(cornerRadius: 7)
@@ -227,9 +260,15 @@ struct MainPlayerView: View {
                     .gesture(
                         DragGesture(minimumDistance: 0)
                             .onChanged { drag in
-                                let percent = Double(drag.location.x / geo.size.width)
+                                seekDragging = true
+                                let percent = max(0, min(1, Double(drag.location.x / geo.size.width)))
+                                seekDragPercent = percent
+                            }
+                            .onEnded { drag in
+                                let percent = max(0, min(1, Double(drag.location.x / geo.size.width)))
                                 let newTime = audioPlayer.duration * percent
-                                audioPlayer.seek(to: max(0, min(newTime, audioPlayer.duration)))
+                                audioPlayer.seek(to: max(0, min(newTime, audioPlayer.duration - 0.1)))
+                                seekDragging = false
                             }
                     )
                 }
