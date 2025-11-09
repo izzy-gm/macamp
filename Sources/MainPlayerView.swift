@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct MainPlayerView: View {
     @EnvironmentObject var audioPlayer: AudioPlayer
@@ -463,6 +464,63 @@ struct MainPlayerView: View {
 }
 
 // MARK: - Classic Title Bar (Modern Winamp Style)
+// NSView that enables window dragging
+final class DraggableWindowView: NSView {
+    override func mouseDown(with event: NSEvent) {
+        guard let window = self.window else { return }
+        
+        // Convert event location to view coordinates
+        let locationInView = self.convert(event.locationInWindow, from: nil)
+        
+        // Check if click is in the right side where buttons are (approximately last 60 points)
+        // Buttons are on the right side, so exclude that area
+        if bounds.width > 0 {
+            let buttonAreaStart = bounds.width - 60
+            if locationInView.x > buttonAreaStart && locationInView.x >= 0 && locationInView.x <= bounds.width {
+                // Let the event pass through to buttons by not handling it
+                // Pass the event to the next responder
+                nextResponder?.mouseDown(with: event)
+                return
+            }
+        }
+        
+        if event.clickCount == 2 {
+            window.performMiniaturize(nil)
+            return
+        }
+        window.performDrag(with: event)
+    }
+    
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        return true
+    }
+    
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        // Check if point is in button area - if so, return nil to let SwiftUI handle it
+        if bounds.width > 0 {
+            let buttonAreaStart = bounds.width - 60
+            if point.x > buttonAreaStart && point.x >= 0 && point.x <= bounds.width {
+                return nil
+            }
+        }
+        return self
+    }
+}
+
+// SwiftUI wrapper for the draggable view
+struct DraggableWindowViewRepresentable: NSViewRepresentable {
+    func makeNSView(context: Context) -> DraggableWindowView {
+        let view = DraggableWindowView()
+        view.wantsLayer = true
+        view.layer?.backgroundColor = NSColor.clear.cgColor
+        return view
+    }
+    
+    func updateNSView(_ nsView: DraggableWindowView, context: Context) {
+        // No updates needed
+    }
+}
+
 struct ClassicTitleBar: View {
     @Binding var isShadeMode: Bool
     @State private var isDragging = false
@@ -523,18 +581,10 @@ struct ClassicTitleBar: View {
                 endPoint: .bottom
             )
         )
-        .gesture(
-            DragGesture()
-                .onChanged { value in
-                    if let window = NSApplication.shared.windows.first {
-                        let currentLocation = NSEvent.mouseLocation
-                        let newOrigin = CGPoint(
-                            x: currentLocation.x - value.startLocation.x,
-                            y: currentLocation.y + value.startLocation.y
-                        )
-                        window.setFrameOrigin(newOrigin)
-                    }
-                }
+        .overlay(
+            // Transparent draggable overlay - hitTest excludes button area
+            DraggableWindowViewRepresentable()
+                .allowsHitTesting(true)
         )
     }
 }

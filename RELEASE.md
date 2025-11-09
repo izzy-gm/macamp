@@ -12,3 +12,11 @@ next:
 
 * Train station, Dissolve and Scrolling text feature in currently playing artist/song title
 * Wave form or bar flavor elements
+
+
+Things to fix:
+
+* The milkdrop when clicked on currently does not maximize in multi-screen environments
+* The playlist when saved and re-opened doesn't play the files for some reason
+* there's a small block under the playlist when minimized that needs to be removed
+* fix the star wars text thingy

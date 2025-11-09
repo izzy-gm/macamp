@@ -9,13 +9,12 @@ struct WinampApp: App {
 
     var body: some Scene {
         WindowGroup {
+            // Use your real ContentView here - unchanged.
             ContentView()
                 .environmentObject(audioPlayer)
                 .environmentObject(playlistManager)
                 .preferredColorScheme(.dark)
-                .background(Color.clear)
-                // Let the window sizing be driven by the SwiftUI content.
-                // Avoid forcing edgesIgnoringSafeArea / infinite frames on macOS.
+                .background(Color.clear) // ensure SwiftUI root isn't forcing an opaque fill
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
@@ -42,85 +41,143 @@ struct WinampApp: App {
     }
 }
 
-// Custom window that can become key without needing a title bar
-class KeyableWindow: NSWindow {
+// Small, transparent icon view that sits in the titlebar and handles dragging
+final class TitlebarIconView: NSView {
+    private let imageView: NSImageView
+
+    init(image: NSImage? = nil, size: CGFloat = 14, paddingRight: CGFloat = 6) {
+        imageView = NSImageView()
+        super.init(frame: .zero)
+
+        translatesAutoresizingMaskIntoConstraints = false
+        wantsLayer = true
+        layer?.backgroundColor = NSColor.clear.cgColor
+
+        let img = image ?? (NSApp.applicationIconImage ?? NSImage(named: NSImage.applicationIconName))
+        imageView.image = img
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.imageScaling = .scaleProportionallyDown
+        imageView.wantsLayer = true
+        imageView.layer?.backgroundColor = NSColor.clear.cgColor
+
+        addSubview(imageView)
+
+        NSLayoutConstraint.activate([
+            imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            imageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: size),
+            imageView.heightAnchor.constraint(equalToConstant: size),
+            trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: paddingRight)
+        ])
+    }
+
+    required init?(coder: NSCoder) {
+        imageView = NSImageView()
+        super.init(coder: coder)
+    }
+
+    override var isFlipped: Bool { true }
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+    override func mouseDown(with event: NSEvent) {
+        guard let win = window else { super.mouseDown(with: event); return }
+        if event.clickCount == 2 {
+            win.performMiniaturize(nil)
+            return
+        }
+        win.performDrag(with: event)
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? { self }
+}
+
+final class TitlebarIconAccessory: NSTitlebarAccessoryViewController {
+    init(icon: NSImage? = nil, iconSize: CGFloat = 14, paddingRight: CGFloat = 6) {
+        super.init(nibName: nil, bundle: nil)
+        let v = TitlebarIconView(image: icon, size: iconSize, paddingRight: paddingRight)
+        self.view = v
+        self.layoutAttribute = .left // we'll position it relative to traffic lights after showing the window
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+}
+
+final class KeyableWindow: NSWindow {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
 
-    override func setFrame(_ frameRect: NSRect, display flag: Bool) {
-        super.setFrame(frameRect, display: flag)
-        self.invalidateShadow()
-    }
-
-    override func setFrame(_ frameRect: NSRect, display displayFlag: Bool, animate animateFlag: Bool) {
-        super.setFrame(frameRect, display: displayFlag, animate: animateFlag)
-        self.invalidateShadow()
-    }
-    override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
-        super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
-        // Make the window transparent
+    override init(contentRect: NSRect, styleMask: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: styleMask, backing: backingStoreType, defer: flag)
+        // Transparent window
         isOpaque = false
-        backgroundColor = NSColor.clear
+        backgroundColor = .clear
         titlebarAppearsTransparent = true
-        isMovableByWindowBackground = true
+        isMovableByWindowBackground = false // we'll use the tiny icon for drag
+        hasShadow = true
     }
-
 }
 
-// App delegate to replace windows with our custom class
-class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Grab the original SwiftUI-hosted window (if any)
         guard let originalWindow = NSApplication.shared.windows.first else { return }
 
-        // Create a new KeyableWindow with appropriate style masks.
-        // Include .titled so the window system provides standard behaviors,
-        // and .fullSizeContentView so content can extend into the titlebar area.
         let style: NSWindow.StyleMask = [
-            .titled,
-            .closable,
-            .miniaturizable,
-            .resizable,
-            .fullSizeContentView
+            .titled, .closable, .miniaturizable, .resizable, .fullSizeContentView
         ]
 
-        let customWindow = KeyableWindow(
-            contentRect: originalWindow.frame,
-            styleMask: style,
-            backing: .buffered,
-            defer: false
-        )
+        let customWindow = KeyableWindow(contentRect: originalWindow.frame, styleMask: style, backing: .buffered, defer: false)
 
-        // Preserve the hosting view controller (this keeps SwiftUI autosizing & layout working)
+        // preserve NSHostingController if present
         if let contentVC = originalWindow.contentViewController {
             customWindow.contentViewController = contentVC
         } else if let contentView = originalWindow.contentView {
-            // Fallback: copy the view and set autoresizing masks so it stretches
             customWindow.contentView = contentView
             contentView.frame = customWindow.contentView?.bounds ?? .zero
             contentView.autoresizingMask = [.width, .height]
         }
 
-        // Make the titlebar look "hidden" but keep behaviors that let user drag the window
+        // make sure the window content is transparent and composited
         customWindow.titlebarAppearsTransparent = true
-        customWindow.isMovableByWindowBackground = true
-
-        // Background and opacity
-        customWindow.backgroundColor = NSColor.windowBackgroundColor
         customWindow.isOpaque = false
         customWindow.backgroundColor = .clear
+        customWindow.contentView?.wantsLayer = true
+        // Clear any background layer color on the hosting view
+        customWindow.contentView?.layer?.backgroundColor = NSColor.clear.cgColor
 
-        // Ensure the window can resize to the content and has reasonable min/max
         customWindow.contentMinSize = NSSize(width: 275, height: 100)
         customWindow.contentMaxSize = NSSize(width: 20000, height: 20000)
 
-        // Preserve other properties
         customWindow.title = originalWindow.title
-        customWindow.level = .floating
+        customWindow.level = originalWindow.level
         customWindow.collectionBehavior = originalWindow.collectionBehavior
 
-        // Show and replace
+        // Add small icon accessory (left-aligned by default)
+        let accessory = TitlebarIconAccessory(icon: nil, iconSize: 14, paddingRight: 6)
+        customWindow.addTitlebarAccessoryViewController(accessory)
+
+        // Show the custom window and close original
         customWindow.makeKeyAndOrderFront(nil)
         originalWindow.close()
+
+        // After the window is visible, attempt to position the accessory to the right of the traffic lights.
+        DispatchQueue.main.async { [weak customWindow] in
+            guard let win = customWindow else { return }
+
+            guard let closeBtnSuperview = win.standardWindowButton(.closeButton)?.superview else {
+                NSLog("WinampApp: could not find close button superview; leaving accessory left-aligned")
+                return
+            }
+
+            // Position accessory relative to the traffic-lights container
+            accessory.view.translatesAutoresizingMaskIntoConstraints = false
+            let gap: CGFloat = 6
+            NSLayoutConstraint.activate([
+                accessory.view.centerYAnchor.constraint(equalTo: closeBtnSuperview.centerYAnchor),
+                accessory.view.leadingAnchor.constraint(equalTo: closeBtnSuperview.trailingAnchor, constant: gap)
+            ])
+        }
     }
 }
