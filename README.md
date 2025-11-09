@@ -59,7 +59,7 @@ alternatively
 
 # Releases
 
-[v1.0.0](./releases/Winamp-1.0.0.dmg)
+[Winamp.dmg v1.0.0](./releases/Winamp-1.0.0.dmg)
 
 ## Support
 
