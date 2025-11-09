@@ -1734,24 +1734,81 @@ struct MilkdropVisualizerView: View {
     
     private func toggleFullscreen() {
         DispatchQueue.main.async {
-            guard let window = NSApplication.shared.windows.first(where: { $0.isVisible }),
-                  let screen = window.screen ?? NSScreen.main else { 
-                return 
+            guard let window = NSApplication.shared.windows.first(where: { $0.isVisible }) else {
+                return
             }
+            
+            // Get all available screens
+            let allScreens = NSScreen.screens
+            
+            // Find the screen that the window is currently on
+            // Check which screen's frame contains the window's center point
+            let windowFrame = window.frame
+            let windowCenter = NSPoint(
+                x: windowFrame.midX,
+                y: windowFrame.midY
+            )
+            
+            // Find the screen that contains the window's center point
+            // This is the most reliable way to determine which monitor the window is on
+            var targetScreen: NSScreen?
+            for screen in allScreens {
+                let screenFrame = screen.frame
+                if screenFrame.contains(windowCenter) {
+                    targetScreen = screen
+                    break
+                }
+            }
+            
+            // Fallback: use window's screen property or main screen
+            if targetScreen == nil {
+                targetScreen = window.screen ?? NSScreen.main ?? allScreens.first
+            }
+            
+            guard let screen = targetScreen else {
+                print("⚠️ Could not determine target screen for fullscreen")
+                return
+            }
+            
+            print("📺 Fullscreen on screen: \(screen.frame) (Total screens: \(allScreens.count))")
             
             if !self.isFullscreen {
                 // Store original frame before going fullscreen
-                UserDefaults.standard.set(NSStringFromRect(window.frame), forKey: "originalWindowFrame")
+                UserDefaults.standard.set(NSStringFromRect(windowFrame), forKey: "originalWindowFrame")
                 
                 // Toggle state first
                 self.isFullscreen = true
                 
-                // Small delay to let SwiftUI update the layout
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    // Go fullscreen - cover entire screen
-                    let screenFrame = screen.frame
-                    window.setFrame(screenFrame, display: true, animate: true)
-                    window.level = .statusBar // Above everything
+                // Get the screen's full frame (covers entire screen including menu bar area)
+                let screenFrame = screen.frame
+                
+                print("📺 Going fullscreen on screen: origin=\(screenFrame.origin), size=\(screenFrame.size)")
+                print("📺 Window current frame: \(windowFrame)")
+                
+                // Set window to exactly match the screen's frame immediately
+                // This ensures it only fullscreens on the current monitor
+                window.setFrame(screenFrame, display: true, animate: false)
+                window.level = .statusBar // Above everything
+                
+                // Small delay to verify and correct if needed
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    // Verify the window is on the correct screen
+                    if let currentScreen = window.screen {
+                        if currentScreen != screen {
+                            // Force window to the target screen by setting frame origin
+                            var newFrame = screenFrame
+                            newFrame.origin = screen.frame.origin
+                            window.setFrame(newFrame, display: true, animate: false)
+                            print("📺 Corrected window position to target screen")
+                        }
+                    }
+                    
+                    // Ensure window fills the entire screen
+                    let currentFrame = window.frame
+                    if currentFrame != screenFrame {
+                        print("📺 Correcting window frame from \(currentFrame) to \(screenFrame)")
+                        window.setFrame(screenFrame, display: true, animate: false)
+                    }
                 }
             } else {
                 // Toggle state first

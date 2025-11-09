@@ -46,12 +46,12 @@ struct ContentView: View {
                     .frame(maxWidth: visualizerFullscreen ? .infinity : nil, maxHeight: visualizerFullscreen ? .infinity : nil)
             }
         }
-        .fixedSize() // Let SwiftUI determine the exact size needed
+        .fixedSize(horizontal: !visualizerFullscreen, vertical: !visualizerFullscreen) // Only fix size when not fullscreen
         .background(Color.black)
         .ignoresSafeArea(.all)
         .onAppear {
             setupWindow()
-            // loadStartupSound()
+            loadStartupSound()
             loadPlaylistSize()
             loadDisplayMode()
             loadTimeDisplayPreference()
