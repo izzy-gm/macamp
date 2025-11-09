@@ -9,16 +9,14 @@ A native macOS application that recreates the classic Winamp experience for play
 <img width="1051" height="633" alt="Screenshot 2025-11-09 at 3 37 26 PM" src="https://github.com/user-attachments/assets/a28d06b8-e427-4ed4-9547-84072368907a" />
 
 
-## Minimized (
+## Minimized (Playlist + Main Window independently)
 
 ![Minimized Playlist](minimized.png)
-
-
 
 ## Features
 
 - 🎵 MP3 and FLAC playback support
-- 🎨 Classic Winamp-inspired UI
+- 🎨 Winamp-inspired UI
 - 📝 Playlist management / M3U
 - ⏯️ Full playback controls (play, pause, stop, next, previous)
 - 📊 Spectrum analyzer visualization
@@ -58,16 +56,6 @@ alternatively
 ```bash
 ./build.sh --release
 ```
-
-## Architecture
-
-The application is built with SwiftUI and uses AVFoundation for audio playback:
-
-- **AudioPlayer**: Core audio engine handling MP3/FLAC playback
-- **PlaylistManager**: Manages the queue of audio files
-- **EqualizerEngine**: 10-band parametric equalizer
-- **SpectrumAnalyzer**: Real-time frequency visualization
-- **WinampUI**: Classic Winamp-style interface components
 
 ## Support
 
