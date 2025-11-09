@@ -137,17 +137,6 @@ struct PlaylistView: View {
             .zIndex(100) // Keep search box well above everything
             }
             
-            // Gray area when minimized (double-click to expand)
-            if isMinimized {
-                Rectangle()
-                    .fill(WinampColors.mainBg)
-                    .frame(height: 16)
-                    .contentShape(Rectangle())
-                    .onTapGesture(count: 2) {
-                        isMinimized.toggle()
-                    }
-            }
-            
             // Playlist content - flat or grouped (only when not minimized)
             if !isMinimized {
             ScrollViewReader { proxy in
