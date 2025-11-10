@@ -13,6 +13,18 @@ A native macOS application that recreates the classic Winamp experience for play
 
 ![Minimized Playlist](minimized.png)
 
+## Releases
+
+[Winamp.dmg v1.0.1](./releases/Winamp-1.0.1.dmg)
+
+# Support
+
+If you enjoy using Winamp macOS and would like to support its development, consider buying me a coffee:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/mgreenwood)
+
+[Support on Buy Me a Coffee](https://buymeacoffee.com/mgreenwood)
+
 ## Features
 
 - 🎵 MP3 and FLAC playback support
@@ -56,18 +68,6 @@ alternatively
 ```bash
 ./build.sh --release
 ```
-
-# Releases
-
-[Winamp.dmg v1.0.1](./releases/Winamp-1.0.1.dmg)
-
-## Support
-
-If you enjoy using Winamp macOS and would like to support its development, consider buying me a coffee:
-
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/mgreenwood)
-
-[Support on Buy Me a Coffee](https://buymeacoffee.com/mgreenwood)
 
 ## License
 
