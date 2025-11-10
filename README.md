@@ -16,7 +16,6 @@ A native macOS application that recreates the classic Winamp experience for play
 ## Releases / Download
 
 [Releases](https://github.com/mgreenwood1001/winamp/releases)
-[Winamp.dmg v1.0.1](./releases/Winamp-1.0.1.dmg)
 
 # Support
 
