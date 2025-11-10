@@ -31,23 +31,22 @@ jobs:
         with:
           xcode-version: '15.0'
       
-      - name: Extract and bump version (main branch only)
-        if: github.ref == 'refs/heads/main'
+      - name: Extract and bump version
         id: get_version
         run: |
-          chmod +x ./bump-version.sh
-          ./bump-version.sh patch
-          VERSION=$(grep -A 1 "MARKETING_VERSION" "Winamp.xcodeproj/project.pbxproj" | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?" | head -n 1)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "📦 Bumped version to: $VERSION"
-      
-      - name: Extract version (feature branches)
-        if: github.ref != 'refs/heads/main'
-        id: get_version
-        run: |
-          VERSION=$(grep -A 1 "MARKETING_VERSION" "Winamp.xcodeproj/project.pbxproj" | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?" | head -n 1)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "📦 Current version: $VERSION"
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "🔄 Bumping version for main branch..."
+            chmod +x ./bump-version.sh
+            ./bump-version.sh patch
+            VERSION=$(grep -A 1 "MARKETING_VERSION" "Winamp.xcodeproj/project.pbxproj" | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?" | head -n 1)
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "📦 Bumped version to: $VERSION"
+          else
+            echo "📋 Extracting version for feature branch..."
+            VERSION=$(grep -A 1 "MARKETING_VERSION" "Winamp.xcodeproj/project.pbxproj" | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?" | head -n 1)
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "📦 Current version: $VERSION"
+          fi
       
       - name: Build application
         run: |
