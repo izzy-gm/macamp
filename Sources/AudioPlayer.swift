@@ -15,9 +15,9 @@ class AudioPlayer: NSObject, ObservableObject {
     @Published var spectrumData: [Float] = Array(repeating: 0, count: 20)
     @Published var currentLyrics: [LyricLine] = []
     @Published var currentLyricText: String?
-    @Published var currentBitrate: Int = 128
-    @Published var currentSampleRate: Double = 44100
-    @Published var currentChannels: Int = 2
+    @Published var currentBitrate: Int = 0
+    @Published var currentSampleRate: Double = 0
+    @Published var currentChannels: Int = 0
     
     private var audioEngine: AVAudioEngine?
     private var playerNode: AVAudioPlayerNode?
@@ -25,6 +25,8 @@ class AudioPlayer: NSObject, ObservableObject {
     private var eqNode: AVAudioUnitEQ?
     private var timer: Timer?
     private var shouldAutoAdvance = true
+    private var seekOffset: TimeInterval = 0  // Tracks position when seeking
+    private var scheduleGeneration: Int = 0  // Counter to track which schedule is current
     private let audioQueue = DispatchQueue(label: "com.winamp.audio", qos: .userInteractive)
 
     // FFT properties for real spectrum analysis
@@ -347,6 +349,10 @@ class AudioPlayer: NSObject, ObservableObject {
                 self.currentTrack = track
                 self.currentLyrics = []
                 self.currentLyricText = nil
+                // Reset audio info until new file loads
+                self.currentBitrate = 0
+                self.currentSampleRate = 0
+                self.currentChannels = 0
             }
             
             // Load lyrics asynchronously
@@ -366,13 +372,22 @@ class AudioPlayer: NSObject, ObservableObject {
                 let newFile = try AVAudioFile(forReading: url)
                 let newDuration = Double(newFile.length) / newFile.fileFormat.sampleRate
                 let format = newFile.fileFormat
-                
+
                 // Extract audio info
                 let sampleRate = format.sampleRate
                 let channels = Int(format.channelCount)
-                // Estimate bitrate (actual bitrate varies, this is an approximation)
-                let bitrate = Int((sampleRate * Double(channels) * 16) / 1000) // Approximate for 16-bit audio
-                
+
+                // Calculate bitrate from file size and duration (most reliable method)
+                var bitrate = 0
+                if newDuration > 0 {
+                    if let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
+                       let fileSize = attrs[.size] as? UInt64 {
+                        // bitrate = (file size in bits) / (duration in seconds) / 1000 for kbps
+                        let rawBitrate = Int((Double(fileSize) * 8.0) / newDuration / 1000.0)
+                        bitrate = self.roundToStandardBitrate(rawBitrate)
+                    }
+                }
+
                 DispatchQueue.main.async {
                     self.audioFile = newFile
                     self.duration = newDuration
@@ -384,6 +399,9 @@ class AudioPlayer: NSObject, ObservableObject {
             } catch {
                 DispatchQueue.main.async {
                     self.audioFile = nil
+                    self.currentBitrate = 0
+                    self.currentSampleRate = 0
+                    self.currentChannels = 0
                 }
             }
         }
@@ -409,18 +427,18 @@ class AudioPlayer: NSObject, ObservableObject {
         // Execute on audio queue to ensure serialization
         audioQueue.async { [weak self] in
             guard let self = self else { return }
-            
+
             guard let player = self.playerNode,
                   let file = self.audioFile,
-                  let engine = self.audioEngine else { 
-                return 
+                  let engine = self.audioEngine else {
+                return
             }
-            
+
             // If already playing, don't schedule again
             if self.isPlaying {
                 return
             }
-            
+
             // Restart engine if needed
             if !engine.isRunning {
                 do {
@@ -429,24 +447,55 @@ class AudioPlayer: NSObject, ObservableObject {
                     return
                 }
             }
-            
+
+            // Increment generation to invalidate any pending completion handlers
+            self.scheduleGeneration += 1
+            let currentGeneration = self.scheduleGeneration
+
             // CRITICAL: Ensure player is completely stopped
             player.stop()
             player.reset()
-            
+
             // Re-enable auto-advance
             self.shouldAutoAdvance = true
-            
-            // Schedule the entire file
-            player.scheduleFile(file, at: nil) { [weak self] in
-                DispatchQueue.main.async {
-                    self?.handleTrackCompletion()
+
+            let sampleRate = file.fileFormat.sampleRate
+
+            // Check if we should resume from a seek position
+            if self.seekOffset > 0 {
+                // Schedule from the seek position
+                let startFrame = AVAudioFramePosition(self.seekOffset * sampleRate)
+                let remainingFrames = file.length - startFrame
+
+                if startFrame < file.length && remainingFrames > 0 {
+                    player.scheduleSegment(
+                        file,
+                        startingFrame: startFrame,
+                        frameCount: AVAudioFrameCount(remainingFrames),
+                        at: nil
+                    ) { [weak self] in
+                        DispatchQueue.main.async {
+                            guard let self = self, currentGeneration == self.scheduleGeneration else { return }
+                            self.handleTrackCompletion()
+                        }
+                    }
+                }
+            } else {
+                // Reset seek offset and play from start
+                self.seekOffset = 0
+
+                // Schedule the entire file
+                player.scheduleFile(file, at: nil) { [weak self] in
+                    DispatchQueue.main.async {
+                        guard let self = self, currentGeneration == self.scheduleGeneration else { return }
+                        self.handleTrackCompletion()
+                    }
                 }
             }
-            
+
             player.volume = self.volume
             player.play()
-            
+
             DispatchQueue.main.async {
                 self.isPlaying = true
                 self.startTimer()
@@ -464,7 +513,16 @@ class AudioPlayer: NSObject, ObservableObject {
     }
     
     func resume() {
-        guard let player = playerNode, !isPlaying else { return }
+        guard !isPlaying else { return }
+
+        // If we have a seek offset, use play() which properly schedules from that position
+        // This handles the case where user seeked while paused
+        if seekOffset > 0 {
+            play()
+            return
+        }
+
+        guard let player = playerNode else { return }
         player.play()
         isPlaying = true
         startTimer()
@@ -476,6 +534,7 @@ class AudioPlayer: NSObject, ObservableObject {
         playerNode?.stop()
         isPlaying = false
         currentTime = 0
+        seekOffset = 0  // Reset seek offset
         stopTimer()
         updateNowPlayingInfo()
 
@@ -500,15 +559,29 @@ class AudioPlayer: NSObject, ObservableObject {
     func seek(to time: TimeInterval) {
         guard let file = audioFile,
               let player = playerNode else { return }
-        
+
         let wasPlaying = isPlaying
-        stop()
-        
+
+        // Increment generation to invalidate any pending completion handlers
+        scheduleGeneration += 1
+        let currentGeneration = scheduleGeneration
+
+        // Stop playback but preserve shouldAutoAdvance state
+        player.stop()
+        isPlaying = false
+        stopTimer()
+
         let sampleRate = file.fileFormat.sampleRate
         let startFrame = AVAudioFramePosition(time * sampleRate)
-        
+
         guard startFrame < file.length else { return }
-        
+
+        // Store the seek offset - player time will be relative to this
+        seekOffset = time
+
+        // Re-enable auto-advance for when track completes
+        shouldAutoAdvance = true
+
         player.scheduleSegment(
             file,
             startingFrame: startFrame,
@@ -516,12 +589,14 @@ class AudioPlayer: NSObject, ObservableObject {
             at: nil
         ) { [weak self] in
             DispatchQueue.main.async {
-                self?.handleTrackCompletion()
+                // Only handle completion if this is still the current schedule
+                guard let self = self, currentGeneration == self.scheduleGeneration else { return }
+                self.handleTrackCompletion()
             }
         }
-        
+
         currentTime = time
-        
+
         if wasPlaying {
             player.play()
             isPlaying = true
@@ -556,10 +631,18 @@ class AudioPlayer: NSObject, ObservableObject {
               let lastRenderTime = player.lastRenderTime,
               let playerTime = player.playerTime(forNodeTime: lastRenderTime),
               let file = audioFile else { return }
-        
+
         let sampleRate = file.fileFormat.sampleRate
-        currentTime = Double(playerTime.sampleTime) / sampleRate
-        
+        // playerTime.sampleTime is relative to when player started
+        // Add seekOffset to get absolute position in file
+        let relativeTime = Double(playerTime.sampleTime) / sampleRate
+        currentTime = seekOffset + relativeTime
+
+        // Clamp to duration to avoid overshooting
+        if currentTime > duration {
+            currentTime = duration
+        }
+
         // Update current lyric based on playback time
         updateCurrentLyric()
     }
@@ -602,12 +685,44 @@ class AudioPlayer: NSObject, ObservableObject {
     }
     
     private func handleTrackCompletion() {
+        // Set currentTime to duration so progress bar reaches the end
+        currentTime = duration
+        seekOffset = 0
+
         isPlaying = false
         stopTimer()
+
         // Only auto-advance if we didn't manually switch tracks
         if shouldAutoAdvance {
             PlaylistManager.shared.next()
         }
+    }
+
+    /// Rounds raw bitrate to nearest standard bitrate for cleaner display
+    /// For lossy formats (< 500 kbps), rounds to common values
+    /// For lossless formats (>= 500 kbps), shows actual value
+    private func roundToStandardBitrate(_ rawBitrate: Int) -> Int {
+        // Standard lossy bitrates
+        let standardBitrates = [32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320]
+
+        // For high bitrates (lossless), return as-is
+        if rawBitrate >= 500 {
+            return rawBitrate
+        }
+
+        // Find the closest standard bitrate
+        var closest = standardBitrates[0]
+        var minDiff = abs(rawBitrate - closest)
+
+        for bitrate in standardBitrates {
+            let diff = abs(rawBitrate - bitrate)
+            if diff < minDiff {
+                minDiff = diff
+                closest = bitrate
+            }
+        }
+
+        return closest
     }
 }
 

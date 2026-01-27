@@ -199,7 +199,7 @@ struct MainPlayerView: View {
                         // Bitrate and format info row
                         HStack(spacing: 4) {
                             // Bitrate display with recessed effect
-                            Text("128")
+                            Text("\(audioPlayer.currentBitrate)")
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
                                 .foregroundColor(WinampColors.displayText)
                                 .shadow(color: WinampColors.displayText.opacity(0.5), radius: 2, x: 0, y: 0)
@@ -227,7 +227,7 @@ struct MainPlayerView: View {
                                 .foregroundColor(Color.white.opacity(0.7))
                             
                             // Sample rate display with recessed effect
-                            Text("44")
+                            Text("\(Int(audioPlayer.currentSampleRate / 1000))")
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
                                 .foregroundColor(WinampColors.displayText)
                                 .shadow(color: WinampColors.displayText.opacity(0.5), radius: 2, x: 0, y: 0)
@@ -922,23 +922,27 @@ struct LEDDisplayView: View {
 }
 
 struct BitrateDisplayView: View {
+    let bitrate: Int
+    let sampleRate: Double
+    let channels: Int
+
     var body: some View {
         HStack(spacing: 2) {
-            Text("128")
+            Text("\(bitrate)")
                 .font(.system(size: 6, design: .monospaced))
                 .foregroundColor(WinampColors.displayText)
-            
+
             Text("•")
                 .font(.system(size: 5))
                 .foregroundColor(WinampColors.displayInactive)
-            
-            Text("44")
+
+            Text("\(Int(sampleRate / 1000))")
                 .font(.system(size: 6, design: .monospaced))
                 .foregroundColor(WinampColors.displayText)
-            
+
             Spacer()
-            
-            Text("stereo")
+
+            Text(channels == 1 ? "mono" : "stereo")
                 .font(.system(size: 6, design: .monospaced))
                 .foregroundColor(WinampColors.displayText)
         }
