@@ -437,7 +437,7 @@ class PlaylistManager: ObservableObject {
         panel.allowsMultipleSelection = true
         panel.canChooseDirectories = false
         panel.canChooseFiles = true
-        panel.allowedContentTypes = [.mp3, .wav, .init(filenameExtension: "flac"), .init(filenameExtension: "m3u")].compactMap { $0 }
+        panel.allowedContentTypes = [.mp3, .wav, .aiff, .init(filenameExtension: "flac"), .init(filenameExtension: "m4a"), .init(filenameExtension: "aac"), .init(filenameExtension: "m3u")].compactMap { $0 }
         
         panel.begin { [weak self] response in
             guard let self = self else { return }
@@ -530,7 +530,7 @@ class PlaylistManager: ObservableObject {
             let fileManager = FileManager.default
             if fileManager.fileExists(atPath: resolvedURL.path) {
                 let ext = resolvedURL.pathExtension.lowercased()
-                if ext == "mp3" || ext == "flac" || ext == "wav" {
+                if ["mp3", "flac", "wav", "m4a", "aac", "aiff", "aif"].contains(ext) {
                     // Create track - this will try to get file size
                     let track = Track(url: resolvedURL)
                     tracks.append(track)
@@ -625,7 +625,7 @@ class PlaylistManager: ObservableObject {
                 }
                 
                 let ext = fileURL.pathExtension.lowercased()
-                if ext == "mp3" || ext == "flac" || ext == "wav" {
+                if ["mp3", "flac", "wav", "m4a", "aac", "aiff", "aif"].contains(ext) {
                     fileURLs.append(fileURL)
                 }
             }

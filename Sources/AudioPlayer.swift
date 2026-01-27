@@ -2,6 +2,7 @@ import Foundation
 import AVFoundation
 import Combine
 import MediaPlayer
+import Accelerate
 
 class AudioPlayer: NSObject, ObservableObject {
     static let shared = AudioPlayer()
@@ -25,11 +26,30 @@ class AudioPlayer: NSObject, ObservableObject {
     private var timer: Timer?
     private var shouldAutoAdvance = true
     private let audioQueue = DispatchQueue(label: "com.winamp.audio", qos: .userInteractive)
+
+    // FFT properties for real spectrum analysis
+    private var fftSetup: vDSP_DFT_Setup?
+    private let fftSize = 2048
+    private var fftWindow: [Float] = []
+    private var fftRealBuffer: [Float] = []
+    private var fftImagBuffer: [Float] = []
+    private var fftMagnitudes: [Float] = []
+    private var smoothedSpectrum: [Float] = Array(repeating: 0, count: 20)
     
     override init() {
         super.init()
         setupAudioEngine()
         setupRemoteCommands()
+    }
+
+    deinit {
+        // Remove audio tap
+        audioEngine?.mainMixerNode.removeTap(onBus: 0)
+
+        // Destroy FFT setup
+        if let fftSetup = fftSetup {
+            vDSP_DFT_DestroySetup(fftSetup)
+        }
     }
     
     private func setupAudioEngine() {
@@ -64,6 +84,165 @@ class AudioPlayer: NSObject, ObservableObject {
         } catch {
             // Failed to start audio engine
         }
+
+        // Initialize FFT for spectrum analysis
+        setupFFT()
+        installAudioTap()
+    }
+
+    private func setupFFT() {
+        // Create DFT setup for real-to-complex transform
+        fftSetup = vDSP_DFT_zrop_CreateSetup(nil, vDSP_Length(fftSize), .FORWARD)
+
+        // Pre-allocate Hann window to reduce spectral leakage
+        fftWindow = [Float](repeating: 0, count: fftSize)
+        vDSP_hann_window(&fftWindow, vDSP_Length(fftSize), Int32(vDSP_HANN_NORM))
+
+        // Pre-allocate FFT buffers
+        fftRealBuffer = [Float](repeating: 0, count: fftSize)
+        fftImagBuffer = [Float](repeating: 0, count: fftSize)
+        fftMagnitudes = [Float](repeating: 0, count: fftSize / 2)
+    }
+
+    private func installAudioTap() {
+        guard let engine = audioEngine else { return }
+
+        let format = engine.mainMixerNode.outputFormat(forBus: 0)
+        let bufferSize = AVAudioFrameCount(fftSize)
+
+        engine.mainMixerNode.installTap(onBus: 0, bufferSize: bufferSize, format: format) { [weak self] buffer, _ in
+            self?.processAudioBuffer(buffer)
+        }
+    }
+
+    private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
+        guard let fftSetup = fftSetup,
+              let channelData = buffer.floatChannelData else { return }
+
+        let frameLength = Int(buffer.frameLength)
+        guard frameLength > 0 else { return }
+
+        // Get samples from first channel (mono or left channel of stereo)
+        let samples = channelData[0]
+
+        // Copy samples and apply Hann window
+        var windowedSamples = [Float](repeating: 0, count: fftSize)
+        let sampleCount = min(frameLength, fftSize)
+
+        for i in 0..<sampleCount {
+            windowedSamples[i] = samples[i] * fftWindow[i]
+        }
+
+        // Prepare split complex buffers for FFT
+        var realInput = [Float](repeating: 0, count: fftSize)
+        var imagInput = [Float](repeating: 0, count: fftSize)
+        var realOutput = [Float](repeating: 0, count: fftSize)
+        var imagOutput = [Float](repeating: 0, count: fftSize)
+
+        // Copy windowed samples to real input (imaginary stays zero)
+        for i in 0..<fftSize {
+            realInput[i] = windowedSamples[i]
+        }
+
+        // Perform DFT
+        vDSP_DFT_Execute(fftSetup, &realInput, &imagInput, &realOutput, &imagOutput)
+
+        // Calculate magnitudes for first half (Nyquist)
+        let halfSize = fftSize / 2
+        var magnitudes = [Float](repeating: 0, count: halfSize)
+
+        // Scale factor: normalize by FFT size to get proper amplitude
+        let scaleFactor = 2.0 / Float(fftSize)
+
+        for i in 0..<halfSize {
+            let real = realOutput[i]
+            let imag = imagOutput[i]
+            // Scale magnitude to normalize FFT output
+            magnitudes[i] = sqrtf(real * real + imag * imag) * scaleFactor
+        }
+
+        // Convert to decibels
+        // Reference: 1.0 = 0dB (full scale)
+        // Typical range: -60dB (quiet) to 0dB (loud)
+        var scaledMagnitudes = [Float](repeating: 0, count: halfSize)
+
+        for i in 0..<halfSize {
+            // Add small epsilon to avoid log(0)
+            let mag = max(magnitudes[i], 1e-10)
+            // Convert to dB: 20 * log10(magnitude)
+            scaledMagnitudes[i] = 20.0 * log10f(mag)
+        }
+
+        // Bin into 20 logarithmic frequency bands
+        let bands = binToLogarithmicBands(scaledMagnitudes, sampleRate: buffer.format.sampleRate)
+
+        // Apply smoothing and update on main thread
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+
+            // Smooth the spectrum for visual appeal (attack/decay)
+            let attackRate: Float = 0.7
+            let decayRate: Float = 0.3
+
+            for i in 0..<20 {
+                if bands[i] > self.smoothedSpectrum[i] {
+                    self.smoothedSpectrum[i] = self.smoothedSpectrum[i] * (1 - attackRate) + bands[i] * attackRate
+                } else {
+                    self.smoothedSpectrum[i] = self.smoothedSpectrum[i] * (1 - decayRate) + bands[i] * decayRate
+                }
+            }
+
+            self.spectrumData = self.smoothedSpectrum
+        }
+    }
+
+    private func binToLogarithmicBands(_ magnitudes: [Float], sampleRate: Double) -> [Float] {
+        let bandCount = 20
+        var bands = [Float](repeating: 0, count: bandCount)
+
+        let nyquist = sampleRate / 2.0
+        let binCount = magnitudes.count
+        let minFreq: Double = 20.0
+        let maxFreq: Double = min(20000.0, nyquist)
+
+        // Calculate logarithmic frequency boundaries for 20 bands
+        let logMin = log10(minFreq)
+        let logMax = log10(maxFreq)
+        let logStep = (logMax - logMin) / Double(bandCount)
+
+        for band in 0..<bandCount {
+            let freqLow = pow(10, logMin + Double(band) * logStep)
+            let freqHigh = pow(10, logMin + Double(band + 1) * logStep)
+
+            // Convert frequencies to FFT bin indices
+            let binLow = Int((freqLow / nyquist) * Double(binCount))
+            let binHigh = Int((freqHigh / nyquist) * Double(binCount))
+
+            let startBin = max(0, min(binLow, binCount - 1))
+            let endBin = max(startBin, min(binHigh, binCount - 1))
+
+            // Average the magnitudes in this frequency range
+            var sum: Float = 0
+            var count = 0
+
+            for bin in startBin...endBin {
+                sum += magnitudes[bin]
+                count += 1
+            }
+
+            if count > 0 {
+                // Convert from dB to 0.0-1.0 range
+                // Dynamic range: -50dB (silence) to 0dB (full scale)
+                // Narrower range = more sensitive/responsive display
+                let avgDb = sum / Float(count)
+                let minDb: Float = -50.0
+                let maxDb: Float = 0.0
+                let normalized = (avgDb - minDb) / (maxDb - minDb)
+                bands[band] = max(0, min(1, normalized))
+            }
+        }
+
+        return bands
     }
     
     private func setupRemoteCommands() {
@@ -299,6 +478,10 @@ class AudioPlayer: NSObject, ObservableObject {
         currentTime = 0
         stopTimer()
         updateNowPlayingInfo()
+
+        // Reset spectrum
+        smoothedSpectrum = Array(repeating: 0, count: 20)
+        spectrumData = smoothedSpectrum
     }
     
     func togglePlayPause() {
@@ -396,10 +579,25 @@ class AudioPlayer: NSObject, ObservableObject {
     }
     
     private func updateSpectrum() {
-        // Simulate spectrum data for visualization
-        // In a production app, you'd use AVAudioEngine tap to get real FFT data
-        spectrumData = (0..<20).map { _ in
-            isPlaying ? Float.random(in: 0...1) : 0
+        // Spectrum is now updated via audio tap callback (processAudioBuffer)
+        // This method handles decay when not playing
+        if !isPlaying {
+            // Decay spectrum to zero when stopped/paused
+            let decayRate: Float = 0.15
+            var hasActivity = false
+
+            for i in 0..<20 {
+                if smoothedSpectrum[i] > 0.01 {
+                    smoothedSpectrum[i] *= (1 - decayRate)
+                    hasActivity = true
+                } else {
+                    smoothedSpectrum[i] = 0
+                }
+            }
+
+            if hasActivity {
+                spectrumData = smoothedSpectrum
+            }
         }
     }
     

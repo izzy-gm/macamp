@@ -441,7 +441,7 @@ struct PlaylistView: View {
                 
                 DispatchQueue.main.async {
                     let ext = url.pathExtension.lowercased()
-                    if ext == "mp3" || ext == "flac" {
+                    if ["mp3", "flac", "wav", "m4a", "aac", "aiff", "aif"].contains(ext) {
                         let track = Track(url: url)
                         playlistManager.addTrack(track)
                     }
