@@ -45,3 +45,5 @@ iOSInjectionProject/
 # IDE & AI
 .nova
 .claude
+/screenshots
+/screenshots/*

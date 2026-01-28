@@ -11,6 +11,7 @@ class AudioPlayer: NSObject, ObservableObject {
     @Published var currentTime: TimeInterval = 0
     @Published var duration: TimeInterval = 0
     @Published var volume: Float = 0.75
+    @Published var balance: Float = 0.0  // -1 = left, 0 = center, 1 = right
     @Published var currentTrack: Track?
     @Published var spectrumData: [Float] = Array(repeating: 0, count: 20)
     @Published var currentLyrics: [LyricLine] = []
@@ -494,6 +495,7 @@ class AudioPlayer: NSObject, ObservableObject {
             }
 
             player.volume = self.volume
+            player.pan = self.balance
             player.play()
 
             DispatchQueue.main.async {
@@ -608,7 +610,12 @@ class AudioPlayer: NSObject, ObservableObject {
         volume = max(0, min(1, newVolume))
         playerNode?.volume = volume
     }
-    
+
+    func setBalance(_ newBalance: Float) {
+        balance = max(-1, min(1, newBalance))
+        playerNode?.pan = balance
+    }
+
     func setEQBand(_ band: Int, gain: Float) {
         guard let eq = eqNode, band < eq.bands.count else { return }
         eq.bands[band].gain = gain

@@ -264,11 +264,10 @@ struct MainPlayerView: View {
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundColor(MacAmpColors.displayText)
                         }
-                        .padding(.horizontal, 4)
 
-                        // Volume slider and EQ/PL buttons
-                        HStack(spacing: 4) {
-                            // Volume slider (green to red)
+                        // Volume slider, Balance slider, and EQ/PL buttons
+                        HStack(spacing: 6) {
+                            // Volume slider (green to red) - aligns with end of "kHz"
                             ModernSlider(
                                 value: Binding(
                                     get: { Double(audioPlayer.volume) },
@@ -277,9 +276,18 @@ struct MainPlayerView: View {
                                 range: 0...1,
                                 color: MacAmpColors.displayText
                             )
-                            .frame(width: 100, height: 12)
+                            .frame(width: 108, height: 12)
+                            .offset(y: 1)
 
-                            Spacer()
+                            // Balance slider (L/R) - fills remaining space
+                            BalanceSlider(
+                                value: Binding(
+                                    get: { Double(audioPlayer.balance) },
+                                    set: { audioPlayer.setBalance(Float($0)) }
+                                )
+                            )
+                            .frame(height: 12)
+                            .offset(y: 1)
 
                             // EQ and PL buttons with indicator lights
                             HStack(spacing: 2) {
@@ -318,6 +326,10 @@ struct MainPlayerView: View {
                             )
 
                         // Progress fill with raised 3D effect (orange/yellow gradient)
+                        // Available width is geo.size.width - 4 (2px padding on each side)
+                        let availableWidth = geo.size.width - 4
+                        let progressPercent = CGFloat(seekDragging ? seekDragPercent : (audioPlayer.currentTime / max(audioPlayer.duration, 1)))
+
                         RoundedRectangle(cornerRadius: 7)
                             .fill(
                                 LinearGradient(
@@ -329,7 +341,7 @@ struct MainPlayerView: View {
                                     endPoint: .bottom
                                 )
                             )
-                            .frame(width: max(16, geo.size.width * CGFloat(seekDragging ? seekDragPercent : (audioPlayer.currentTime / max(audioPlayer.duration, 1)))))
+                            .frame(width: max(16, availableWidth * progressPercent))
                             .overlay(
                                 // Enhanced raised bevel - bright white on top, dark shadow on bottom
                                 RoundedRectangle(cornerRadius: 7)
@@ -372,7 +384,8 @@ struct MainPlayerView: View {
                     )
                 }
                 .frame(height: 20)
-                .padding(.horizontal, 8)
+                .padding(.leading, 8)
+                .padding(.trailing, 8)
                 .padding(.vertical, 6)
 
                 // Control buttons row
@@ -415,6 +428,7 @@ struct MainPlayerView: View {
                     }
                     .buttonStyle(.plain)
                 }
+                .padding(.horizontal, 8)
             }
             .background(MacAmpColors.mainBg)
             .gesture(
@@ -526,48 +540,49 @@ struct ClassicTitleBar: View {
     @State private var isDragging = false
 
     var body: some View {
-        HStack(spacing: 0) {
-            // Left decorative element
-            Image(systemName: "waveform")
-                .font(.system(size: 8, weight: .bold))
-                .foregroundColor(Color(red: 1.0, green: 0.8, blue: 0.3))
-                .frame(width: 20)
-
-            // Decorative lines
-            Rectangle()
-                .fill(LinearGradient(
-                    colors: [.white.opacity(0.5), .white.opacity(0.1)],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                ))
-                .frame(width: 50, height: 1)
-
-            Spacer().frame(width: 10)
-
-            // Title text
+        ZStack {
+            // Centered title text
             Text("MACAMP")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundColor(.white)
                 .tracking(2)
 
-            Spacer()
+            // Left and right elements
+            HStack(spacing: 0) {
+                // Left decorative element
+                Image(systemName: "waveform")
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundColor(Color(red: 1.0, green: 0.8, blue: 0.3))
+                    .frame(width: 20)
 
-            // Decorative lines
-            Rectangle()
-                .fill(LinearGradient(
-                    colors: [.white.opacity(0.1), .white.opacity(0.5)],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                ))
-                .frame(width: 50, height: 1)
+                // Decorative lines
+                Rectangle()
+                    .fill(LinearGradient(
+                        colors: [.white.opacity(0.5), .white.opacity(0.1)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ))
+                    .frame(width: 50, height: 1)
 
-            // Modern window controls (matching the image style)
-            HStack(spacing: 2) {
-                ModernWindowButton(icon: "○", tooltip: "Minimize", action: .minimize, isShadeMode: $isShadeMode)
-                ModernWindowButton(icon: "▼", tooltip: "Shade", action: .shade, isShadeMode: $isShadeMode)
-                ModernWindowButton(icon: "✕", tooltip: "Close", action: .close, isShadeMode: $isShadeMode)
+                Spacer()
+
+                // Decorative lines
+                Rectangle()
+                    .fill(LinearGradient(
+                        colors: [.white.opacity(0.1), .white.opacity(0.5)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ))
+                    .frame(width: 50, height: 1)
+
+                // Modern window controls (matching the image style)
+                HStack(spacing: 2) {
+                    ModernWindowButton(icon: "○", tooltip: "Minimize", action: .minimize, isShadeMode: $isShadeMode)
+                    ModernWindowButton(icon: "▼", tooltip: "Shade", action: .shade, isShadeMode: $isShadeMode)
+                    ModernWindowButton(icon: "✕", tooltip: "Close", action: .close, isShadeMode: $isShadeMode)
+                }
+                .padding(.trailing, 4)
             }
-            .padding(.trailing, 4)
         }
         .padding(.horizontal, 8)
         .frame(height: 14)
@@ -623,7 +638,7 @@ struct ModernWindowButton: View {
         case .shade:
             isShadeMode.toggle()
         case .close:
-            window.close()
+            NSApp.terminate(nil)
         }
     }
 }
@@ -1483,39 +1498,44 @@ struct ModernSlider: View {
                 }
             }()
 
-            ZStack(alignment: .leading) {
-                // Solid color background that changes with volume
-                RoundedRectangle(cornerRadius: 8)
+            ZStack {
+                // Solid color background that changes with volume (thinner bar)
+                RoundedRectangle(cornerRadius: 4)
                     .fill(backgroundColor)
                     .overlay(
-                        // Enhanced inner shadow effect
-                        RoundedRectangle(cornerRadius: 8)
+                        // Enhanced inner shadow effect (vertical gradient for consistent height)
+                        RoundedRectangle(cornerRadius: 4)
                             .strokeBorder(
                                 LinearGradient(
                                     colors: [
-                                        Color.black.opacity(0.9),
-                                        Color.black.opacity(0.5),
-                                        Color.white.opacity(0.1),
-                                        Color.white.opacity(0.3)
+                                        Color.black.opacity(0.7),
+                                        Color.white.opacity(0.2)
                                     ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
+                                    startPoint: .top,
+                                    endPoint: .bottom
                                 ),
-                                lineWidth: 1.5
+                                lineWidth: 1
                             )
                     )
+                    .overlay(
+                        // Outer border on the bar
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(Color.black.opacity(0.5), lineWidth: 0.5)
+                    )
+                    .frame(height: 8)
+                    .shadow(color: Color.black.opacity(0.3), radius: 1, x: 0, y: 1)
 
                 // Speaker icon on left side
                 HStack {
                     Image(systemName: "speaker.wave.2.fill")
-                        .font(.system(size: 7, weight: .bold))
+                        .font(.system(size: 6, weight: .bold))
                         .foregroundColor(Color.white.opacity(0.7))
                         .shadow(color: Color.black.opacity(0.5), radius: 1, x: 0, y: 1)
                         .padding(.leading, 3)
                     Spacer()
                 }
 
-                // Dot slider handle
+                // Dot slider handle (sticks out of the bar)
                 let handleX = (geometry.size.width - 10) * CGFloat(volumePercent)
 
                 Circle()
@@ -1532,14 +1552,8 @@ struct ModernSlider: View {
                             .strokeBorder(Color.black.opacity(0.5), lineWidth: 1)
                     )
                     .shadow(color: Color.black.opacity(0.4), radius: 2, x: 0, y: 1)
-                    .offset(x: handleX)
+                    .offset(x: handleX - (geometry.size.width / 2) + 5)
             }
-            .overlay(
-                // Outer border
-                RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(Color.black.opacity(0.5), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.3), radius: 1, x: 0, y: 1)
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { drag in
@@ -1547,6 +1561,99 @@ struct ModernSlider: View {
                         let percent = Double(drag.location.x / geometry.size.width)
                         let newValue = range.lowerBound + (range.upperBound - range.lowerBound) * percent
                         value = min(max(newValue, range.lowerBound), range.upperBound)
+                    }
+                    .onEnded { _ in
+                        isDragging = false
+                    }
+            )
+        }
+    }
+}
+
+// Balance slider with fixed orange color and L/R labels
+struct BalanceSlider: View {
+    @Binding var value: Double  // -1 = left, 0 = center, 1 = right
+    @State private var isDragging = false
+
+    // Balance slider color - #4b9532 with slight gradient for 3D effect
+    private let barColor = LinearGradient(
+        colors: [
+            Color(red: 95/255, green: 169/255, blue: 70/255),   // Lighter shade
+            Color(red: 75/255, green: 149/255, blue: 50/255)    // #4b9532
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+    )
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                // Fixed orange background bar (same height as volume slider bar)
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(barColor)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(
+                                LinearGradient(
+                                    colors: [
+                                        Color.black.opacity(0.7),
+                                        Color.white.opacity(0.2)
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                ),
+                                lineWidth: 1
+                            )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(Color.black.opacity(0.5), lineWidth: 0.5)
+                    )
+                    .frame(height: 8)
+                    .shadow(color: Color.black.opacity(0.3), radius: 1, x: 0, y: 1)
+
+                // L and R labels (moved 3px inward)
+                HStack {
+                    Text("L")
+                        .font(.system(size: 6, weight: .bold))
+                        .foregroundColor(Color.white.opacity(0.7))
+                        .shadow(color: Color.black.opacity(0.5), radius: 1, x: 0, y: 1)
+                        .padding(.leading, 5)
+                    Spacer()
+                    Text("R")
+                        .font(.system(size: 6, weight: .bold))
+                        .foregroundColor(Color.white.opacity(0.7))
+                        .shadow(color: Color.black.opacity(0.5), radius: 1, x: 0, y: 1)
+                        .padding(.trailing, 5)
+                }
+
+                // Dot slider handle - position based on balance (-1 to 1 mapped to slider width)
+                let balancePercent = (value + 1) / 2  // Convert -1...1 to 0...1
+                let handleX = (geometry.size.width - 10) * CGFloat(balancePercent)
+
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [MacAmpColors.buttonLight, MacAmpColors.buttonFace],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 10, height: 10)
+                    .overlay(
+                        Circle()
+                            .strokeBorder(Color.black.opacity(0.5), lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.4), radius: 2, x: 0, y: 1)
+                    .offset(x: handleX - (geometry.size.width / 2) + 5)
+            }
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { drag in
+                        isDragging = true
+                        let percent = Double(drag.location.x / geometry.size.width)
+                        // Convert 0...1 to -1...1
+                        value = min(max((percent * 2) - 1, -1), 1)
                     }
                     .onEnded { _ in
                         isDragging = false

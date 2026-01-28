@@ -160,7 +160,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
-    /// Static method to handle file opens - can be called from AppDelegate or SwiftUI onOpenURL
+    /// Static method to handle file opens - clears playlist and plays (for "Open with" behavior)
     static func handleOpenURLs(_ urls: [URL], isInitialLaunch: Bool = false) {
         // Mark that files were opened with the app (for startup sound logic)
         if isInitialLaunch {
@@ -173,30 +173,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         guard !audioURLs.isEmpty else { return }
 
-        // Only stop audio on initial launch (to stop startup sound)
-        // Don't stop if app is already running and user is adding more files
-        if isInitialLaunch {
-            AudioPlayer.shared.stop()
-        }
+        // Stop any current playback
+        AudioPlayer.shared.stop()
+
+        // Clear the existing playlist
+        PlaylistManager.shared.clearPlaylist()
 
         // Add files to playlist and play the first one
         let tracks = audioURLs.map { Track(url: $0) }
-
-        // Get the index where new tracks will be added
-        let startIndex = PlaylistManager.shared.tracks.count
 
         // Add tracks to playlist
         PlaylistManager.shared.addTracks(tracks)
 
         // Play the first opened file
         if !tracks.isEmpty {
-            PlaylistManager.shared.playTrack(at: startIndex)
+            PlaylistManager.shared.playTrack(at: 0)
         }
+    }
+
+    /// Adds files to playlist without clearing (for "Add to MacAmp Playlist" service)
+    static func addToPlaylist(_ urls: [URL]) {
+        // Filter for supported audio files
+        let supportedExtensions = ["mp3", "flac", "wav", "m4a", "aac", "aiff", "aif"]
+        let audioURLs = urls.filter { supportedExtensions.contains($0.pathExtension.lowercased()) }
+
+        guard !audioURLs.isEmpty else { return }
+
+        // Add files to playlist
+        let tracks = audioURLs.map { Track(url: $0) }
+        PlaylistManager.shared.addTracks(tracks)
+
+        // Bring app to front
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    /// Service handler for "Add to MacAmp Playlist" context menu
+    @objc func addToPlaylistService(_ pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString?>) {
+        guard let urls = pboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] else {
+            error.pointee = "Could not read files from pasteboard" as NSString
+            return
+        }
+
+        AppDelegate.addToPlaylist(urls)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Mark app as fully launched
         AppDelegate.appHasLaunched = true
+
+        // Register as services provider for "Add to MacAmp Playlist" context menu
+        NSApp.servicesProvider = self
+
         guard let originalWindow = NSApplication.shared.windows.first else { return }
 
         let style: NSWindow.StyleMask = [

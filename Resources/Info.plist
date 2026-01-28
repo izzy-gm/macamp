@@ -126,6 +126,31 @@
 			</dict>
 		</dict>
 	</array>
+	<key>NSServices</key>
+	<array>
+		<dict>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Add to MacAmp Playlist</string>
+			</dict>
+			<key>NSMessage</key>
+			<string>addToPlaylistService</string>
+			<key>NSPortName</key>
+			<string>MacAmp</string>
+			<key>NSSendFileTypes</key>
+			<array>
+				<string>public.audio</string>
+				<string>public.mp3</string>
+				<string>public.mpeg-4-audio</string>
+				<string>com.apple.m4a-audio</string>
+				<string>org.xiph.flac</string>
+				<string>com.microsoft.waveform-audio</string>
+				<string>public.aiff-audio</string>
+				<string>public.aifc-audio</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
 

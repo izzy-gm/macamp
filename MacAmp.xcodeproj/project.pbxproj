@@ -11,7 +11,6 @@
 		A10000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000002 /* ContentView.swift */; };
 		A10000003 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000003 /* AudioPlayer.swift */; };
 		A10000004 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000004 /* Track.swift */; };
-		A10000014 /* LyricsParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000014 /* LyricsParser.swift */; };
 		A10000005 /* PlaylistManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000005 /* PlaylistManager.swift */; };
 		A10000006 /* MainPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000006 /* MainPlayerView.swift */; };
 		A10000007 /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000007 /* PlaylistView.swift */; };
@@ -20,15 +19,15 @@
 		A10000010 /* MacAmpColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010 /* MacAmpColors.swift */; };
 		A10000011 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000011 /* Assets.xcassets */; };
 		A10000012 /* startup.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A20000013 /* startup.mp3 */; };
+		A10000014 /* LyricsParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000014 /* LyricsParser.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A10000000 /* Macamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Macamp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000 /* MacAmp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacAmp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000001 /* MacAmpApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAmpApp.swift; sourceTree = "<group>"; };
 		A20000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A20000003 /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		A20000004 /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
-		A20000014 /* LyricsParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsParser.swift; sourceTree = "<group>"; };
 		A20000005 /* PlaylistManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistManager.swift; sourceTree = "<group>"; };
 		A20000006 /* MainPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPlayerView.swift; sourceTree = "<group>"; };
 		A20000007 /* PlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistView.swift; sourceTree = "<group>"; };
@@ -38,6 +37,7 @@
 		A20000011 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A20000012 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A20000013 /* startup.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = startup.mp3; sourceTree = "<group>"; };
+		A20000014 /* LyricsParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsParser.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,7 +91,7 @@
 		A40000004 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000 /* Macamp.app */,
+				A10000000 /* MacAmp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -99,9 +99,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A50000001 /* Macamp */ = {
+		A50000001 /* MacAmp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A60000001 /* Build configuration list for PBXNativeTarget "Macamp" */;
+			buildConfigurationList = A60000001 /* Build configuration list for PBXNativeTarget "MacAmp" */;
 			buildPhases = (
 				A70000001 /* Sources */,
 				A30000001 /* Frameworks */,
@@ -113,7 +113,7 @@
 			);
 			name = MacAmp;
 			productName = MacAmp;
-			productReference = A10000000 /* Macamp.app */;
+			productReference = A10000000 /* MacAmp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -126,7 +126,7 @@
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 			};
-			buildConfigurationList = A60000002 /* Build configuration list for PBXProject "Macamp" */;
+			buildConfigurationList = A60000002 /* Build configuration list for PBXProject "MacAmp" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -138,7 +138,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A50000001 /* Macamp */,
+				A50000001 /* MacAmp */,
 			);
 		};
 /* End PBXProject section */
@@ -239,6 +239,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MacAmp;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -316,6 +317,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MacAmp;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -351,7 +353,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A60000001 /* Build configuration list for PBXNativeTarget "Macamp" */ = {
+		A60000001 /* Build configuration list for PBXNativeTarget "MacAmp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A11000001 /* Debug */,
@@ -360,7 +362,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A60000002 /* Build configuration list for PBXProject "Macamp" */ = {
+		A60000002 /* Build configuration list for PBXProject "MacAmp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A11000003 /* Debug */,
@@ -373,4 +375,3 @@
 	};
 	rootObject = A90000001 /* Project object */;
 }
-
