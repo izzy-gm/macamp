@@ -91,19 +91,26 @@ struct ContentView: View {
     }
     
     private func loadStartupSound() {
-        // Load the startup.mp3 from the app bundle
-        guard let startupURL = Bundle.main.url(forResource: "startup", withExtension: "mp3") else {
-            return
-        }
-        
-        // Create a track for the startup sound
-        let startupTrack = Track(url: startupURL)
-        
-        // Play it directly without adding to playlist
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        // Delay slightly to allow file open handler to run first
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [self] in
+            // Only play startup sound if:
+            // 1. No files were opened with the app (via "Open With" or drag to dock)
+            // 2. No files are in the playlist
+            guard !AppDelegate.filesOpenedOnLaunch else { return }
+            guard playlistManager.tracks.isEmpty else { return }
+
+            // Load the startup.mp3 from the app bundle
+            guard let startupURL = Bundle.main.url(forResource: "startup", withExtension: "mp3") else {
+                return
+            }
+
+            // Create a track for the startup sound
+            let startupTrack = Track(url: startupURL)
+
+            // Play it directly without adding to playlist
             audioPlayer.loadTrack(startupTrack)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                audioPlayer.play()
+                self.audioPlayer.play()
             }
         }
     }

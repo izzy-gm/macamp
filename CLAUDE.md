@@ -49,6 +49,10 @@ xcodebuild -project Winamp.xcodeproj -scheme Winamp -configuration Debug build
 **Audio Pipeline**
 ```
 AVAudioFile → AVAudioPlayerNode → AVAudioUnitEQ (10-band) → MainMixer → Output
+                                                                ↓
+                                                          Audio Tap (FFT)
+                                                                ↓
+                                                         Spectrum Display
 ```
 
 **Security-Scoped Bookmarks**
@@ -75,6 +79,9 @@ AVAudioFile → AVAudioPlayerNode → AVAudioUnitEQ (10-band) → MainMixer → 
 ## Development Notes
 
 - CI auto-bumps patch version on main branch pushes (see `.github/workflows/build.yml`)
-- Spectrum analyzer uses simulated data (real FFT not implemented)
-- Supports MP3, FLAC, WAV, M4A playback; M3U playlist import/export
+- Spectrum analyzer uses real FFT via Apple Accelerate framework (vDSP) with logarithmic frequency binning
+- Supports MP3, FLAC, WAV, M4A, AAC, AIFF playback; M3U playlist import/export
 - LRC lyrics files parsed and displayed during playback
+- Single-instance app: opening files activates existing instance instead of launching new one
+- Playlist supports drag and drop reordering (flat view only, disabled during search)
+- Real bitrate display calculated from file size and duration

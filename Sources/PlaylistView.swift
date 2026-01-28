@@ -13,7 +13,11 @@ struct PlaylistView: View {
     @State private var userInitiatedPlayback = false // Track if user clicked to play a song
     @State private var lastCurrentIndex = -1 // Track the last index to detect changes
     @State private var searchText = "" // Search filter text
-    
+
+    // Drag and drop state
+    @State private var draggedTrackId: Track.ID?
+    @State private var dropTargetIndex: Int?
+
     // Resizing state
     @Binding var playlistSize: CGSize
     @Binding var isMinimized: Bool
@@ -206,13 +210,16 @@ struct PlaylistView: View {
                         } else {
                             // Flat view - all tracks (filtered)
                             ForEach(filteredTracks, id: \.track.id) { indexedTrack in
+                                let isDragTarget = dropTargetIndex == indexedTrack.index
+                                let isBeingDragged = draggedTrackId == indexedTrack.track.id
+
                                 Button(action: {
                                     let trackId = indexedTrack.track.id
                                     let trackIndex = indexedTrack.index
-                                    
+
                                     // Always select the track first
                                     selectedTrack = trackId
-                                    
+
                                     // Double-click detection
                                     if lastTappedTrack == trackId, let timer = tapTimer, timer.isValid {
                                         // This is a double-click on the same track
@@ -229,15 +236,42 @@ struct PlaylistView: View {
                                         }
                                     }
                                 }) {
-                                    ClassicPlaylistRow(
-                                        track: indexedTrack.track,
-                                        index: indexedTrack.index + 1,
-                                        isPlaying: indexedTrack.index == playlistManager.currentIndex,
-                                        isSelected: indexedTrack.track.id == selectedTrack
-                                    )
+                                    VStack(spacing: 0) {
+                                        // Drop indicator above this row
+                                        if isDragTarget && !isBeingDragged {
+                                            Rectangle()
+                                                .fill(WinampColors.playlistCurrentTrack)
+                                                .frame(height: 2)
+                                        }
+
+                                        ClassicPlaylistRow(
+                                            track: indexedTrack.track,
+                                            index: indexedTrack.index + 1,
+                                            isPlaying: indexedTrack.index == playlistManager.currentIndex,
+                                            isSelected: indexedTrack.track.id == selectedTrack
+                                        )
+                                        .opacity(isBeingDragged ? 0.5 : 1.0)
+                                    }
                                 }
                                 .buttonStyle(.plain)
                                 .id(indexedTrack.track.id)
+                                .onDrag {
+                                    // Only allow drag when not searching
+                                    if searchText.isEmpty {
+                                        draggedTrackId = indexedTrack.track.id
+                                    }
+                                    return NSItemProvider(object: indexedTrack.track.id.uuidString as NSString)
+                                }
+                                .onDrop(of: [.text], isTargeted: Binding(
+                                    get: { dropTargetIndex == indexedTrack.index },
+                                    set: { isTargeted in
+                                        if searchText.isEmpty {
+                                            dropTargetIndex = isTargeted ? indexedTrack.index : nil
+                                        }
+                                    }
+                                )) { providers in
+                                    handleTrackDrop(providers: providers, destinationIndex: indexedTrack.index)
+                                }
                                 .contextMenu {
                                     Button("Play") {
                                         userInitiatedPlayback = true
@@ -247,6 +281,21 @@ struct PlaylistView: View {
                                         playlistManager.removeTrack(at: indexedTrack.index)
                                     }
                                 }
+                            }
+
+                            // Drop zone at the end of the list
+                            if !playlistManager.tracks.isEmpty && searchText.isEmpty {
+                                Rectangle()
+                                    .fill(dropTargetIndex == playlistManager.tracks.count ? WinampColors.playlistCurrentTrack : Color.clear)
+                                    .frame(height: dropTargetIndex == playlistManager.tracks.count ? 2 : 12)
+                                    .onDrop(of: [.text], isTargeted: Binding(
+                                        get: { dropTargetIndex == playlistManager.tracks.count },
+                                        set: { isTargeted in
+                                            dropTargetIndex = isTargeted ? playlistManager.tracks.count : nil
+                                        }
+                                    )) { providers in
+                                        handleTrackDrop(providers: providers, destinationIndex: playlistManager.tracks.count)
+                                    }
                             }
                         }
                     }
@@ -308,7 +357,7 @@ struct PlaylistView: View {
                 Spacer()
                 
                 // Track count display
-                Text("\(String(format: "%04d", playlistManager.tracks.count))")
+                Text("\(playlistManager.tracks.count)")
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                     .foregroundColor(WinampColors.displayText)
                     .padding(.horizontal, 6)
@@ -438,7 +487,7 @@ struct PlaylistView: View {
             provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, error in
                 guard let data = item as? Data,
                       let url = URL(dataRepresentation: data, relativeTo: nil) else { return }
-                
+
                 DispatchQueue.main.async {
                     let ext = url.pathExtension.lowercased()
                     if ["mp3", "flac", "wav", "m4a", "aac", "aiff", "aif"].contains(ext) {
@@ -448,6 +497,43 @@ struct PlaylistView: View {
                 }
             }
         }
+    }
+
+    private func handleTrackDrop(providers: [NSItemProvider], destinationIndex: Int) -> Bool {
+        // Try using the state-based draggedTrackId first
+        if let draggedId = draggedTrackId,
+           let sourceIndex = playlistManager.tracks.firstIndex(where: { $0.id == draggedId }) {
+            // Perform the move
+            playlistManager.moveTrack(from: sourceIndex, to: destinationIndex)
+
+            // Reset drag state
+            draggedTrackId = nil
+            dropTargetIndex = nil
+            return true
+        }
+
+        // Fallback: try to load the track ID from providers
+        let manager = playlistManager
+        for provider in providers {
+            if provider.canLoadObject(ofClass: NSString.self) {
+                provider.loadObject(ofClass: NSString.self) { item, _ in
+                    guard let uuidString = item as? String,
+                          let uuid = UUID(uuidString: uuidString) else { return }
+
+                    DispatchQueue.main.async {
+                        if let sourceIndex = manager.tracks.firstIndex(where: { $0.id == uuid }) {
+                            manager.moveTrack(from: sourceIndex, to: destinationIndex)
+                        }
+                    }
+                }
+                return true
+            }
+        }
+
+        // Reset state
+        draggedTrackId = nil
+        dropTargetIndex = nil
+        return false
     }
 }
 
@@ -459,8 +545,8 @@ struct ClassicPlaylistRow: View {
     
     var body: some View {
         HStack(spacing: 2) {
-            // Index with dot (4-digit zero-padded)
-            Text(String(format: "%04d.", index))
+            // Index with dot
+            Text("\(index).")
                 .font(.system(size: 9, design: .monospaced))
                 .foregroundColor(isPlaying ? WinampColors.playlistCurrentTrack : WinampColors.playlistText)
                 .frame(width: 35, alignment: .trailing)

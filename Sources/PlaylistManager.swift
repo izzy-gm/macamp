@@ -109,12 +109,12 @@ class PlaylistManager: ObservableObject {
     func removeTrack(at index: Int) {
         guard index >= 0 && index < tracks.count else { return }
         tracks.remove(at: index)
-        
+
         // Regenerate shuffle order if shuffle is enabled
         if shuffleEnabled {
             generateShuffledIndices()
         }
-        
+
         if tracks.isEmpty {
             currentIndex = -1
             AudioPlayer.shared.stop()
@@ -123,6 +123,41 @@ class PlaylistManager: ObservableObject {
             currentIndex = min(index, tracks.count - 1)
         } else if index < currentIndex {
             currentIndex -= 1
+        }
+    }
+
+    func moveTrack(from sourceIndex: Int, to destinationIndex: Int) {
+        guard sourceIndex >= 0 && sourceIndex < tracks.count else { return }
+        guard destinationIndex >= 0 && destinationIndex <= tracks.count else { return }
+        guard sourceIndex != destinationIndex else { return }
+
+        // Get the track being moved
+        let track = tracks[sourceIndex]
+
+        // Remove from source
+        tracks.remove(at: sourceIndex)
+
+        // Calculate the actual destination index after removal
+        let actualDestination = sourceIndex < destinationIndex ? destinationIndex - 1 : destinationIndex
+
+        // Insert at destination
+        tracks.insert(track, at: actualDestination)
+
+        // Update currentIndex if needed
+        if currentIndex == sourceIndex {
+            // The currently playing track was moved
+            currentIndex = actualDestination
+        } else if sourceIndex < currentIndex && actualDestination >= currentIndex {
+            // Track moved from before current to after current
+            currentIndex -= 1
+        } else if sourceIndex > currentIndex && actualDestination <= currentIndex {
+            // Track moved from after current to before current
+            currentIndex += 1
+        }
+
+        // Regenerate shuffle order if shuffle is enabled
+        if shuffleEnabled {
+            generateShuffledIndices()
         }
     }
     

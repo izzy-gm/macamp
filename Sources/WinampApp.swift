@@ -8,7 +8,7 @@ struct WinampApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        WindowGroup {
+        Window("Winamp", id: "main-window") {
             // Use your real ContentView here - unchanged.
             ContentView()
                 .environmentObject(audioPlayer)
@@ -121,7 +121,82 @@ final class KeyableWindow: NSWindow {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    /// Tracks whether files were opened with the app (via right-click "Open With" or drag to dock)
+    static var filesOpenedOnLaunch = false
+    /// Tracks if the app has fully launched (to distinguish initial launch from subsequent file opens)
+    static var appHasLaunched = false
+    /// URLs to open (stored if we need to pass them to existing instance)
+    static var pendingURLs: [URL] = []
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // Check if another instance of this app is already running
+        let dominated = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier ?? "")
+        let others = dominated.filter { $0 != NSRunningApplication.current }
+
+        if !others.isEmpty {
+            // Another instance is running - activate it and quit this one
+            if let existingApp = others.first {
+                existingApp.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
+            }
+
+            // The existing instance will receive the open URLs via Apple Events
+            // We just need to quit this instance
+            DispatchQueue.main.async {
+                NSApp.terminate(nil)
+            }
+        }
+    }
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        AppDelegate.handleOpenURLs(urls, isInitialLaunch: !AppDelegate.appHasLaunched)
+    }
+
+    /// Prevent app from creating new instances when clicking dock icon
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            // Show the main window if it was closed
+            sender.windows.first?.makeKeyAndOrderFront(nil)
+        }
+        return true
+    }
+
+    /// Static method to handle file opens - can be called from AppDelegate or SwiftUI onOpenURL
+    static func handleOpenURLs(_ urls: [URL], isInitialLaunch: Bool = false) {
+        // Mark that files were opened with the app (for startup sound logic)
+        if isInitialLaunch {
+            filesOpenedOnLaunch = true
+        }
+
+        // Filter for supported audio files
+        let supportedExtensions = ["mp3", "flac", "wav", "m4a", "aac", "aiff", "aif"]
+        let audioURLs = urls.filter { supportedExtensions.contains($0.pathExtension.lowercased()) }
+
+        guard !audioURLs.isEmpty else { return }
+
+        // Only stop audio on initial launch (to stop startup sound)
+        // Don't stop if app is already running and user is adding more files
+        if isInitialLaunch {
+            AudioPlayer.shared.stop()
+        }
+
+        // Add files to playlist and play the first one
+        let tracks = audioURLs.map { Track(url: $0) }
+
+        // Get the index where new tracks will be added
+        let startIndex = PlaylistManager.shared.tracks.count
+
+        // Add tracks to playlist
+        PlaylistManager.shared.addTracks(tracks)
+
+        // Play the first opened file
+        if !tracks.isEmpty {
+            PlaylistManager.shared.playTrack(at: startIndex)
+        }
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Mark app as fully launched
+        AppDelegate.appHasLaunched = true
         guard let originalWindow = NSApplication.shared.windows.first else { return }
 
         let style: NSWindow.StyleMask = [
