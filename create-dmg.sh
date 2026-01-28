@@ -1,11 +1,11 @@
 #!/bin/bash
-# Create DMG Installer for Macamp
+# Create DMG Installer for MacAmp
 # This script creates a distributable DMG with a nice layout
 
 set -e
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_NAME="Macamp"
+PROJECT_NAME="MacAmp"
 
 # Get version from command line argument or extract from Xcode project
 if [ -n "$1" ]; then
@@ -23,7 +23,7 @@ DMG_NAME="${PROJECT_NAME}-${VERSION}"
 BUILD_DIR="${PROJECT_DIR}/dmg-build"
 RELEASE_DIR="${PROJECT_DIR}/release"
 
-echo "🎵 Creating Macamp DMG Installer..."
+echo "🎵 Creating MacAmp DMG Installer..."
 echo ""
 
 # Clean up any previous build artifacts
@@ -169,6 +169,6 @@ echo ""
 echo "To distribute:"
 echo "  1. Upload to your website/cloud storage"
 echo "  2. Users download and mount the DMG"
-echo "  3. Users drag Macamp.app to Applications folder"
+echo "  3. Users drag MacAmp.app to Applications folder"
 echo ""
 
