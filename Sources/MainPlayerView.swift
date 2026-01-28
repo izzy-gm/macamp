@@ -22,7 +22,7 @@ struct MainPlayerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Classic Winamp title bar with logo
+            // Classic MacAmp title bar with logo
             ClassicTitleBar(isShadeMode: $isShadeMode)
             
             // Main content area - matching reference layout exactly
@@ -45,15 +45,15 @@ struct MainPlayerView: View {
                             }) {
                                 Image(systemName: audioPlayer.isPlaying ? "pause.fill" : "play.fill")
                                     .font(.system(size: 10, weight: .bold))
-                                    .foregroundColor(WinampColors.displayText)
+                                    .foregroundColor(MacAmpColors.displayText)
                                     .frame(width: 16, height: 16)
                             }
                             .buttonStyle(.plain)
                             
                             Text(formatTime(showRemainingTime ? -(audioPlayer.duration - audioPlayer.currentTime) : audioPlayer.currentTime, showNegative: showRemainingTime))
                                 .font(.system(size: 22, weight: .bold, design: .monospaced))
-                                .foregroundColor(WinampColors.displayText)
-                                .shadow(color: WinampColors.displayText.opacity(0.6), radius: 3, x: 0, y: 0)
+                                .foregroundColor(MacAmpColors.displayText)
+                                .shadow(color: MacAmpColors.displayText.opacity(0.6), radius: 3, x: 0, y: 0)
                                 .onTapGesture {
                                     showRemainingTime.toggle()
                                 }
@@ -174,7 +174,7 @@ struct MainPlayerView: View {
                         VStack(spacing: 2) {
                             Text("\(audioPlayer.currentBitrate) kbps • \(Int(audioPlayer.currentSampleRate / 1000)) kHz")
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
-                                .foregroundColor(WinampColors.displayText)
+                                .foregroundColor(MacAmpColors.displayText)
                             Text("\(audioPlayer.currentChannels) channel\(audioPlayer.currentChannels > 1 ? "s" : "")")
                                 .font(.system(size: 9, weight: .medium))
                                 .foregroundColor(Color.white.opacity(0.7))
@@ -201,8 +201,8 @@ struct MainPlayerView: View {
                             // Bitrate display with recessed effect
                             Text("\(audioPlayer.currentBitrate)")
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
-                                .foregroundColor(WinampColors.displayText)
-                                .shadow(color: WinampColors.displayText.opacity(0.5), radius: 2, x: 0, y: 0)
+                                .foregroundColor(MacAmpColors.displayText)
+                                .shadow(color: MacAmpColors.displayText.opacity(0.5), radius: 2, x: 0, y: 0)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
                                 .background(Color.black)
@@ -229,8 +229,8 @@ struct MainPlayerView: View {
                             // Sample rate display with recessed effect
                             Text("\(Int(audioPlayer.currentSampleRate / 1000))")
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
-                                .foregroundColor(WinampColors.displayText)
-                                .shadow(color: WinampColors.displayText.opacity(0.5), radius: 2, x: 0, y: 0)
+                                .foregroundColor(MacAmpColors.displayText)
+                                .shadow(color: MacAmpColors.displayText.opacity(0.5), radius: 2, x: 0, y: 0)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
                                 .background(Color.black)
@@ -262,7 +262,7 @@ struct MainPlayerView: View {
                             
                             Text("stereo")
                                 .font(.system(size: 9, weight: .bold))
-                                .foregroundColor(WinampColors.displayText)
+                                .foregroundColor(MacAmpColors.displayText)
                         }
                         .padding(.horizontal, 4)
                         
@@ -275,7 +275,7 @@ struct MainPlayerView: View {
                                     set: { audioPlayer.setVolume(Float($0)) }
                                 ),
                                 range: 0...1,
-                                color: WinampColors.displayText
+                                color: MacAmpColors.displayText
                             )
                             .frame(width: 100, height: 12)
                             
@@ -379,29 +379,29 @@ struct MainPlayerView: View {
                 HStack(spacing: 4) {
                     // Main playback controls
                     HStack(spacing: 2) {
-                        WinampButton(icon: "⏮", width: 32) { playlistManager.previous() }
-                        WinampButton(icon: "▶", width: 32) { audioPlayer.play() }
-                        WinampButton(icon: "⏸", width: 32) { audioPlayer.pause() }
-                        WinampButton(icon: "⏹", width: 32) { audioPlayer.stop() }
-                        WinampButton(icon: "⏭", width: 32) { playlistManager.next() }
+                        MacAmpButton(icon: "⏮", width: 32) { playlistManager.previous() }
+                        MacAmpButton(icon: "▶", width: 32) { audioPlayer.play() }
+                        MacAmpButton(icon: "⏸", width: 32) { audioPlayer.pause() }
+                        MacAmpButton(icon: "⏹", width: 32) { audioPlayer.stop() }
+                        MacAmpButton(icon: "⏭", width: 32) { playlistManager.next() }
                     }
                     
                     // Eject/Open button
-                    WinampButton(icon: "⏏", width: 32) { playlistManager.showFilePicker() }
+                    MacAmpButton(icon: "⏏", width: 32) { playlistManager.showFilePicker() }
                     
                     Spacer()
                     
                     // Shuffle and Repeat buttons
                     HStack(spacing: 2) {
-                        WinampToggle(text: "SHUFFLE", isOn: $shuffleEnabled, width: 60)
-                        WinampToggle(text: "REPEAT", isOn: $repeatEnabled, width: 50)
+                        MacAmpToggle(text: "SHUFFLE", isOn: $shuffleEnabled, width: 60)
+                        MacAmpToggle(text: "REPEAT", isOn: $repeatEnabled, width: 50)
                     }
                     
                     // Visualization toggle button with icon
                     Button(action: { showVisualization.toggle() }) {
                         ZStack {
-                            // Winamp icon
-                            Image("WinampIcon")
+                            // MacAmp icon
+                            Image("MacAmpIcon")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 18, height: 18)
@@ -416,7 +416,7 @@ struct MainPlayerView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .background(WinampColors.mainBg)
+            .background(MacAmpColors.mainBg)
             .gesture(
                 DragGesture()
                     .onChanged { value in
@@ -435,7 +435,7 @@ struct MainPlayerView: View {
             }
         }
         .frame(width: 450, height: 160)
-        .background(WinampColors.mainBg)
+        .background(MacAmpColors.mainBg)
         .ignoresSafeArea(.all, edges: .top)
         .onDisappear {
             stopAutoToggle()
@@ -463,7 +463,7 @@ struct MainPlayerView: View {
     }
 }
 
-// MARK: - Classic Title Bar (Modern Winamp Style)
+// MARK: - Classic Title Bar (Modern MacAmp Style)
 // NSView that enables window dragging
 final class DraggableWindowView: NSView {
     override func mouseDown(with event: NSEvent) {
@@ -689,8 +689,8 @@ struct ShadeView: View {
                 // Time display with 3D inset
                 Text(formatTime(showRemainingTime ? -(audioPlayer.duration - audioPlayer.currentTime) : audioPlayer.currentTime, showNegative: showRemainingTime))
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    .foregroundColor(WinampColors.displayText)
-                    .shadow(color: WinampColors.displayText.opacity(0.5), radius: 2, x: 0, y: 0)
+                    .foregroundColor(MacAmpColors.displayText)
+                    .shadow(color: MacAmpColors.displayText.opacity(0.5), radius: 2, x: 0, y: 0)
                     .frame(width: 50, height: 20)
                     .background(
                         ZStack {
@@ -881,7 +881,7 @@ struct WindowButton: View {
             .font(.system(size: size, weight: .bold))
             .foregroundColor(.white)
             .frame(width: 12, height: 12)
-            .background(isPressed ? WinampColors.buttonPressed : Color.clear)
+            .background(isPressed ? MacAmpColors.buttonPressed : Color.clear)
             .contentShape(Rectangle())
             .onTapGesture {
                 isPressed = true
@@ -903,7 +903,7 @@ struct LEDDisplayView: View {
                 if let track = playlistManager.currentTrack {
                     Text(track.title.uppercased())
                         .font(.system(size: 9, weight: .regular, design: .monospaced))
-                        .foregroundColor(WinampColors.displayText)
+                        .foregroundColor(MacAmpColors.displayText)
                         .lineLimit(1)
                         .offset(x: scrollOffset)
                         .padding(.leading, 4)
@@ -911,7 +911,7 @@ struct LEDDisplayView: View {
                 } else {
                     Text("WINAMP")
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(WinampColors.displayInactive)
+                        .foregroundColor(MacAmpColors.displayInactive)
                         .padding(.leading, 4)
                         .padding(.vertical, 4)
                 }
@@ -930,21 +930,21 @@ struct BitrateDisplayView: View {
         HStack(spacing: 2) {
             Text("\(bitrate)")
                 .font(.system(size: 6, design: .monospaced))
-                .foregroundColor(WinampColors.displayText)
+                .foregroundColor(MacAmpColors.displayText)
 
             Text("•")
                 .font(.system(size: 5))
-                .foregroundColor(WinampColors.displayInactive)
+                .foregroundColor(MacAmpColors.displayInactive)
 
             Text("\(Int(sampleRate / 1000))")
                 .font(.system(size: 6, design: .monospaced))
-                .foregroundColor(WinampColors.displayText)
+                .foregroundColor(MacAmpColors.displayText)
 
             Spacer()
 
             Text(channels == 1 ? "mono" : "stereo")
                 .font(.system(size: 6, design: .monospaced))
-                .foregroundColor(WinampColors.displayText)
+                .foregroundColor(MacAmpColors.displayText)
         }
         .padding(.horizontal, 2)
     }
@@ -956,12 +956,12 @@ struct LEDTimeDisplay: View {
     var body: some View {
         Text(formatTime(time))
             .font(.system(size: 11, weight: .bold, design: .monospaced))
-            .foregroundColor(WinampColors.displayText)
+            .foregroundColor(MacAmpColors.displayText)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(WinampColors.displayBg)
+            .background(MacAmpColors.displayBg)
             .overlay(
                 Rectangle()
-                    .strokeBorder(WinampColors.borderDark, lineWidth: 1)
+                    .strokeBorder(MacAmpColors.borderDark, lineWidth: 1)
             )
     }
     
@@ -982,47 +982,47 @@ struct ClassicControlButtons: View {
     var body: some View {
         HStack(spacing: 2) {
             // Previous
-            WinampButton(icon: "⏮", width: 23) {
+            MacAmpButton(icon: "⏮", width: 23) {
                 playlistManager.previous()
             }
             
             // Play
-            WinampButton(icon: "▶", width: 23) {
+            MacAmpButton(icon: "▶", width: 23) {
                 audioPlayer.play()
             }
             
             // Pause
-            WinampButton(icon: "⏸", width: 23) {
+            MacAmpButton(icon: "⏸", width: 23) {
                 audioPlayer.pause()
             }
             
             // Stop
-            WinampButton(icon: "⏹", width: 23) {
+            MacAmpButton(icon: "⏹", width: 23) {
                 audioPlayer.stop()
             }
             
             // Next
-            WinampButton(icon: "⏭", width: 23) {
+            MacAmpButton(icon: "⏭", width: 23) {
                 playlistManager.next()
             }
             
             // Eject (open file)
-            WinampButton(icon: "⏏", width: 23) {
+            MacAmpButton(icon: "⏏", width: 23) {
                 playlistManager.showFilePicker()
             }
             
             Spacer()
             
             // Equalizer toggle
-            WinampToggle(text: "EQ", isOn: $showEqualizer, width: 23)
+            MacAmpToggle(text: "EQ", isOn: $showEqualizer, width: 23)
             
             // Playlist toggle
-            WinampToggle(text: "PL", isOn: $showPlaylist, width: 23)
+            MacAmpToggle(text: "PL", isOn: $showPlaylist, width: 23)
         }
     }
 }
 
-struct WinampButton: View {
+struct MacAmpButton: View {
     let icon: String
     let width: CGFloat
     let action: () -> Void
@@ -1109,7 +1109,7 @@ struct WinampButton: View {
     }
 }
 
-struct WinampToggle: View {
+struct MacAmpToggle: View {
     let text: String
     @Binding var isOn: Bool
     let width: CGFloat
@@ -1127,9 +1127,9 @@ struct WinampToggle: View {
                 
                 // Indicator light in top-right corner
                 Rectangle()
-                    .fill(isOn ? WinampColors.displayText : Color.black)
+                    .fill(isOn ? MacAmpColors.displayText : Color.black)
                     .frame(width: 5, height: 5)
-                    .shadow(color: isOn ? WinampColors.displayText : Color.clear, radius: 3, x: 0, y: 0)
+                    .shadow(color: isOn ? MacAmpColors.displayText : Color.clear, radius: 3, x: 0, y: 0)
                     .offset(x: -3, y: 3)
             }
             .frame(width: width, height: 18)
@@ -1178,12 +1178,12 @@ struct MonoSlider: View {
             ZStack(alignment: .leading) {
                 // Track
                 Rectangle()
-                    .fill(WinampColors.mainBgDark)
+                    .fill(MacAmpColors.mainBgDark)
                     .overlay(
                         // 3D inset effect
                         VStack(spacing: 0) {
                             Rectangle()
-                                .fill(WinampColors.borderDark)
+                                .fill(MacAmpColors.borderDark)
                                 .frame(height: 1)
                             Spacer()
                         }
@@ -1195,7 +1195,7 @@ struct MonoSlider: View {
                 let xPosition = CGFloat(progress) * (geometry.size.width - 4)
                 
                 Rectangle()
-                    .fill(WinampColors.displayText)
+                    .fill(MacAmpColors.displayText)
                     .frame(width: 4, height: 8)
                     .offset(x: max(0, min(xPosition, geometry.size.width - 4)))
             }
@@ -1265,14 +1265,14 @@ struct ClutterbarSlider: View {
             ZStack(alignment: .leading) {
                 // Track
                 Rectangle()
-                    .fill(WinampColors.mainBgDark)
+                    .fill(MacAmpColors.mainBgDark)
                     .frame(height: 4)
                 
                 // Thumb
                 let xPosition = CGFloat(value) * (width - 3)
                 
                 Rectangle()
-                    .fill(WinampColors.displayText)
+                    .fill(MacAmpColors.displayText)
                     .frame(width: 3, height: 6)
                     .offset(x: max(0, min(xPosition, width - 3)))
             }
@@ -1300,20 +1300,20 @@ struct TimeDisplayView: View {
         HStack(spacing: 4) {
             Text(formatTime(audioPlayer.currentTime))
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
-                .foregroundColor(WinampColors.displayText)
+                .foregroundColor(MacAmpColors.displayText)
                 .frame(width: 50, alignment: .trailing)
             
             Text("/")
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
-                .foregroundColor(WinampColors.displayText.opacity(0.5))
+                .foregroundColor(MacAmpColors.displayText.opacity(0.5))
             
             Text(formatTime(audioPlayer.duration))
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
-                .foregroundColor(WinampColors.displayText.opacity(0.7))
+                .foregroundColor(MacAmpColors.displayText.opacity(0.7))
                 .frame(width: 50, alignment: .leading)
         }
         .padding(6)
-        .background(WinampColors.displayBg)
+        .background(MacAmpColors.displayBg)
         .cornerRadius(2)
     }
     
@@ -1331,18 +1331,18 @@ struct VolumeControlView: View {
         HStack(spacing: 4) {
             Image(systemName: "speaker.fill")
                 .font(.system(size: 10))
-                .foregroundColor(WinampColors.displayText)
+                .foregroundColor(MacAmpColors.displayText)
             
             Slider(value: Binding(
                 get: { audioPlayer.volume },
                 set: { audioPlayer.setVolume($0) }
             ), in: 0...1)
-            .accentColor(WinampColors.displayText)
+            .accentColor(MacAmpColors.displayText)
             .frame(width: 60)
             
             Text("\(Int(audioPlayer.volume * 100))%")
                 .font(.system(size: 9, design: .monospaced))
-                .foregroundColor(WinampColors.displayText)
+                .foregroundColor(MacAmpColors.displayText)
                 .frame(width: 30, alignment: .trailing)
         }
     }
@@ -1367,7 +1367,7 @@ struct PositionSliderView: View {
                 }
             }
         )
-        .accentColor(WinampColors.titleBarHighlight)
+        .accentColor(MacAmpColors.titleBarHighlight)
     }
 }
 
@@ -1409,7 +1409,7 @@ struct ControlButton: View {
                 .frame(width: 32, height: 32)
                 .background(
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(isPressed ? WinampColors.buttonPressed : WinampColors.buttonFace)
+                        .fill(isPressed ? MacAmpColors.buttonPressed : MacAmpColors.buttonFace)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 4)
@@ -1437,7 +1437,7 @@ struct ToggleButton: View {
                 .frame(width: 30, height: 20)
                 .background(
                     RoundedRectangle(cornerRadius: 2)
-                        .fill(isOn ? WinampColors.titleBarHighlight : WinampColors.buttonFace)
+                        .fill(isOn ? MacAmpColors.titleBarHighlight : MacAmpColors.buttonFace)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 2)
@@ -1521,7 +1521,7 @@ struct ModernSlider: View {
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: [WinampColors.buttonLight, WinampColors.buttonFace],
+                            colors: [MacAmpColors.buttonLight, MacAmpColors.buttonFace],
                             startPoint: .top,
                             endPoint: .bottom
                         )
@@ -1572,9 +1572,9 @@ struct ModernToggleButtonWithLight: View {
                 
                 // Indicator light in top-right corner
                 Rectangle()
-                    .fill(isOn ? WinampColors.displayText : Color.black)
+                    .fill(isOn ? MacAmpColors.displayText : Color.black)
                     .frame(width: 5, height: 5)
-                    .shadow(color: isOn ? WinampColors.displayText : Color.clear, radius: 3, x: 0, y: 0)
+                    .shadow(color: isOn ? MacAmpColors.displayText : Color.clear, radius: 3, x: 0, y: 0)
                     .offset(x: -3, y: 3)
             }
             .frame(width: 24, height: 20)
@@ -3055,7 +3055,7 @@ struct AnimatedSongDisplay: View {
             Canvas { context, size in
                 let text = Text(fullText)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(WinampColors.displayText)
+                    .foregroundColor(MacAmpColors.displayText)
                 
                 let resolved = context.resolve(text)
                 let textWidth = resolved.measure(in: size).width
@@ -3111,7 +3111,7 @@ struct AnimatedSongDisplay: View {
                 
                 let text = Text(fullText)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(WinampColors.displayText)
+                    .foregroundColor(MacAmpColors.displayText)
                 
                 let resolved = context.resolve(text)
                 let textWidth = resolved.measure(in: size).width
@@ -3122,7 +3122,7 @@ struct AnimatedSongDisplay: View {
                     let displayText = String(fullText.prefix(revealedChars))
                     let revealedText = Text(displayText)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(WinampColors.displayText)
+                        .foregroundColor(MacAmpColors.displayText)
                     let revealedResolved = context.resolve(revealedText)
                     context.draw(revealedResolved, at: CGPoint(x: 6, y: size.height / 2), anchor: .leading)
                 } else {
@@ -3156,7 +3156,7 @@ struct AnimatedSongDisplay: View {
                 
                 let text = Text(currentText)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(WinampColors.displayText)
+                    .foregroundColor(MacAmpColors.displayText)
                 
                 let resolved = context.resolve(text)
                 let textHeight = resolved.measure(in: CGSize(width: width - 12, height: .infinity)).height
@@ -3265,7 +3265,7 @@ struct AnimatedSongDisplay: View {
                     
                     let charText = Text(String(char))
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(WinampColors.displayText.opacity(opacity))
+                        .foregroundColor(MacAmpColors.displayText.opacity(opacity))
                     
                     let resolved = context.resolve(charText)
                     let charWidth = resolved.measure(in: size).width

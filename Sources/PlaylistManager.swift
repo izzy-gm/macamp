@@ -52,7 +52,7 @@ class PlaylistManager: ObservableObject {
     // Security-scoped bookmark management
     private var activeSecurityScopes: Set<URL> = []
     private var securityScopedBookmarks: [Data] = []
-    private let bookmarksKey = "WinampSecurityScopedBookmarks"
+    private let bookmarksKey = "MacAmpSecurityScopedBookmarks"
     
     init() {
         // No automatic playback on index change to prevent feedback loops

@@ -49,7 +49,7 @@ class LyricsParser {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Winamp/1.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("MacAmp/1.0", forHTTPHeaderField: "User-Agent")
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {

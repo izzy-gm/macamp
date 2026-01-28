@@ -25,7 +25,7 @@ MacAmp - Native macOS music player inspired by the classic Winamp. Built with Sw
 ./bump-version.sh [major|minor|patch]
 
 # Xcode command line
-xcodebuild -project Winamp.xcodeproj -scheme Winamp -configuration Debug build
+xcodebuild -project MacAmp.xcodeproj -scheme MacAmp -configuration Debug build
 ```
 
 ## Architecture
@@ -65,7 +65,7 @@ AVAudioFile → AVAudioPlayerNode → AVAudioUnitEQ (10-band) → MainMixer → 
 - File scanning and metadata extraction on background threads
 - UI updates dispatched to main thread
 
-### Keyboard Shortcuts (defined in WinampApp.swift)
+### Keyboard Shortcuts (defined in MacAmpApp.swift)
 
 | Key | Action |
 |-----|--------|

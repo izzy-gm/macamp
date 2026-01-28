@@ -58,14 +58,14 @@ struct PlaylistView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Classic Winamp Playlist header
+            // Classic MacAmp Playlist header
             HStack(spacing: 3) {
                 Image(systemName: "waveform")
                     .font(.system(size: 7, weight: .bold))
                     .foregroundColor(.white)
                     .frame(width: 9, height: 9)
                 
-                Text("Winamp Playlist")
+                Text("MacAmp Playlist")
                     .font(.system(size: 9, weight: .regular))
                     .foregroundColor(.white)
                 
@@ -86,7 +86,7 @@ struct PlaylistView: View {
             .frame(height: 14)
             .background(
                 LinearGradient(
-                    colors: [WinampColors.titleBarHighlight, WinampColors.titleBar],
+                    colors: [MacAmpColors.titleBarHighlight, MacAmpColors.titleBar],
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -101,22 +101,22 @@ struct PlaylistView: View {
                 ZStack {
                 // Background
                 Rectangle()
-                    .fill(WinampColors.displayBg)
+                    .fill(MacAmpColors.displayBg)
                     .overlay(
                         Rectangle()
-                            .stroke(WinampColors.borderDark, lineWidth: 1)
+                            .stroke(MacAmpColors.borderDark, lineWidth: 1)
                     )
                 
                 HStack(spacing: 4) {
                     Image(systemName: "magnifyingglass")
                         .font(.system(size: 8))
-                        .foregroundColor(WinampColors.displayText)
+                        .foregroundColor(MacAmpColors.displayText)
                         .frame(width: 12)
                     
                     TextField("Search...", text: $searchText)
                         .textFieldStyle(.plain)
                         .font(.system(size: 9, design: .monospaced))
-                        .foregroundColor(WinampColors.displayText)
+                        .foregroundColor(MacAmpColors.displayText)
                         .frame(height: 16)
                         .frame(maxWidth: .infinity)
                         .background(Color.clear)
@@ -128,7 +128,7 @@ struct PlaylistView: View {
                         }) {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.system(size: 8))
-                                .foregroundColor(WinampColors.displayText.opacity(0.6))
+                                .foregroundColor(MacAmpColors.displayText.opacity(0.6))
                         }
                         .buttonStyle(.plain)
                         .frame(width: 12)
@@ -240,7 +240,7 @@ struct PlaylistView: View {
                                         // Drop indicator above this row
                                         if isDragTarget && !isBeingDragged {
                                             Rectangle()
-                                                .fill(WinampColors.playlistCurrentTrack)
+                                                .fill(MacAmpColors.playlistCurrentTrack)
                                                 .frame(height: 2)
                                         }
 
@@ -286,7 +286,7 @@ struct PlaylistView: View {
                             // Drop zone at the end of the list
                             if !playlistManager.tracks.isEmpty && searchText.isEmpty {
                                 Rectangle()
-                                    .fill(dropTargetIndex == playlistManager.tracks.count ? WinampColors.playlistCurrentTrack : Color.clear)
+                                    .fill(dropTargetIndex == playlistManager.tracks.count ? MacAmpColors.playlistCurrentTrack : Color.clear)
                                     .frame(height: dropTargetIndex == playlistManager.tracks.count ? 2 : 12)
                                     .onDrop(of: [.text], isTargeted: Binding(
                                         get: { dropTargetIndex == playlistManager.tracks.count },
@@ -300,7 +300,7 @@ struct PlaylistView: View {
                         }
                     }
                 }
-                .background(WinampColors.playlistBg)
+                .background(MacAmpColors.playlistBg)
                 .onChange(of: playlistManager.tracks.count) { newCount in
                     // When new tracks are added, expand all artists and scroll to show the last one
                     if newCount > lastTrackCount && !playlistManager.tracks.isEmpty {
@@ -338,31 +338,31 @@ struct PlaylistView: View {
                 HStack(spacing: 4) {
                     Text(formatTime(audioPlayer.currentTime))
                         .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundColor(WinampColors.displayText)
+                        .foregroundColor(MacAmpColors.displayText)
                         .frame(width: 50, alignment: .trailing)
                     
                     Text("/")
                         .font(.system(size: 10, design: .monospaced))
-                        .foregroundColor(WinampColors.displayInactive)
+                        .foregroundColor(MacAmpColors.displayInactive)
                     
                     Text(formatTime(totalDuration))
                         .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundColor(WinampColors.displayText)
+                        .foregroundColor(MacAmpColors.displayText)
                         .frame(width: 50, alignment: .leading)
                 }
                 .padding(.horizontal, 6)
                 .padding(.vertical, 2)
-                .background(WinampColors.displayBg)
+                .background(MacAmpColors.displayBg)
                 
                 Spacer()
                 
                 // Track count display
                 Text("\(playlistManager.tracks.count)")
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    .foregroundColor(WinampColors.displayText)
+                    .foregroundColor(MacAmpColors.displayText)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
-                    .background(WinampColors.displayBg)
+                    .background(MacAmpColors.displayBg)
                 
                 Spacer()
                 
@@ -408,7 +408,7 @@ struct PlaylistView: View {
                 }
             }
             .frame(height: 20)
-            .background(WinampColors.mainBg)
+            .background(MacAmpColors.mainBg)
             .contentShape(Rectangle())
             .onTapGesture(count: 2) {
                 isMinimized.toggle()
@@ -419,7 +419,7 @@ struct PlaylistView: View {
                 ResizeHandle(isDragging: $isDragging, playlistSize: $playlistSize)
             }
         }
-        .background(WinampColors.mainBgDark)
+        .background(MacAmpColors.mainBgDark)
         .frame(width: playlistSize.width, height: isMinimized ? 50 : playlistSize.height)
         .onAppear {
             // Load saved grouped/flat view preference
@@ -548,15 +548,15 @@ struct ClassicPlaylistRow: View {
             // Index with dot
             Text("\(index).")
                 .font(.system(size: 9, design: .monospaced))
-                .foregroundColor(isPlaying ? WinampColors.playlistCurrentTrack : WinampColors.playlistText)
+                .foregroundColor(isPlaying ? MacAmpColors.playlistCurrentTrack : MacAmpColors.playlistText)
                 .frame(width: 35, alignment: .trailing)
             
             // Artist - Title
             Text("\(track.artist) - \(track.title)")
                 .font(.system(size: 9, design: .monospaced))
                 .foregroundColor(
-                    isPlaying ? WinampColors.playlistCurrentTrack :
-                    isSelected ? .white : WinampColors.playlistText
+                    isPlaying ? MacAmpColors.playlistCurrentTrack :
+                    isSelected ? .white : MacAmpColors.playlistText
                 )
                 .lineLimit(1)
                 .truncationMode(.tail)
@@ -566,15 +566,15 @@ struct ClassicPlaylistRow: View {
             // Duration
             Text(track.formattedDuration)
                 .font(.system(size: 9, design: .monospaced))
-                .foregroundColor(isPlaying ? WinampColors.playlistCurrentTrack : WinampColors.playlistText)
+                .foregroundColor(isPlaying ? MacAmpColors.playlistCurrentTrack : MacAmpColors.playlistText)
                 .frame(width: 35, alignment: .trailing)
         }
         .padding(.horizontal, 4)
         .padding(.vertical, 0)
         .frame(height: 12)
         .background(
-            isPlaying ? WinampColors.playlistCurrentTrackBg :
-            isSelected ? WinampColors.playlistSelected : Color.clear
+            isPlaying ? MacAmpColors.playlistCurrentTrackBg :
+            isSelected ? MacAmpColors.playlistSelected : Color.clear
         )
     }
 }
@@ -601,26 +601,26 @@ struct PlaylistButton: View {
                 .frame(minWidth: 30)
                 .background(
                     ZStack {
-                        isPressed ? WinampColors.buttonPressed : WinampColors.buttonFace
+                        isPressed ? MacAmpColors.buttonPressed : MacAmpColors.buttonFace
                         
                         // 3D border effect
                         VStack(spacing: 0) {
                             Rectangle()
-                                .fill(isPressed ? WinampColors.buttonDark : WinampColors.buttonLight)
+                                .fill(isPressed ? MacAmpColors.buttonDark : MacAmpColors.buttonLight)
                                 .frame(height: 1)
                             Spacer()
                             Rectangle()
-                                .fill(isPressed ? WinampColors.buttonLight : WinampColors.buttonDark)
+                                .fill(isPressed ? MacAmpColors.buttonLight : MacAmpColors.buttonDark)
                                 .frame(height: 1)
                         }
                         
                         HStack(spacing: 0) {
                             Rectangle()
-                                .fill(isPressed ? WinampColors.buttonDark : WinampColors.buttonLight)
+                                .fill(isPressed ? MacAmpColors.buttonDark : MacAmpColors.buttonLight)
                                 .frame(width: 1)
                             Spacer()
                             Rectangle()
-                                .fill(isPressed ? WinampColors.buttonLight : WinampColors.buttonDark)
+                                .fill(isPressed ? MacAmpColors.buttonLight : MacAmpColors.buttonDark)
                                 .frame(width: 1)
                         }
                     }
@@ -653,26 +653,26 @@ struct PlaylistMenuButton<Content: View>: View {
                 .frame(minWidth: 30)
                 .background(
                     ZStack {
-                        WinampColors.buttonFace
+                        MacAmpColors.buttonFace
                         
                         // 3D border effect
                         VStack(spacing: 0) {
                             Rectangle()
-                                .fill(WinampColors.buttonLight)
+                                .fill(MacAmpColors.buttonLight)
                                 .frame(height: 1)
                             Spacer()
                             Rectangle()
-                                .fill(WinampColors.buttonDark)
+                                .fill(MacAmpColors.buttonDark)
                                 .frame(height: 1)
                         }
                         
                         HStack(spacing: 0) {
                             Rectangle()
-                                .fill(WinampColors.buttonLight)
+                                .fill(MacAmpColors.buttonLight)
                                 .frame(width: 1)
                             Spacer()
                             Rectangle()
-                                .fill(WinampColors.buttonDark)
+                                .fill(MacAmpColors.buttonDark)
                                 .frame(width: 1)
                         }
                     }
@@ -791,7 +791,7 @@ struct ResizeHandle: View {
             HStack(spacing: 2) {
                 ForEach(0..<3) { i in
                     Rectangle()
-                        .fill(i % 2 == 0 ? WinampColors.buttonDark : WinampColors.buttonLight)
+                        .fill(i % 2 == 0 ? MacAmpColors.buttonDark : MacAmpColors.buttonLight)
                         .frame(width: 8, height: 1)
                 }
             }

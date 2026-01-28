@@ -27,7 +27,7 @@ class AudioPlayer: NSObject, ObservableObject {
     private var shouldAutoAdvance = true
     private var seekOffset: TimeInterval = 0  // Tracks position when seeking
     private var scheduleGeneration: Int = 0  // Counter to track which schedule is current
-    private let audioQueue = DispatchQueue(label: "com.winamp.audio", qos: .userInteractive)
+    private let audioQueue = DispatchQueue(label: "com.macamp.audio", qos: .userInteractive)
 
     // FFT properties for real spectrum analysis
     private var fftSetup: vDSP_DFT_Setup?
@@ -61,7 +61,7 @@ class AudioPlayer: NSObject, ObservableObject {
         // Setup 10-band equalizer
         eqNode = AVAudioUnitEQ(numberOfBands: 10)
         
-        // Configure EQ bands (Winamp-style frequencies)
+        // Configure EQ bands (MacAmp-style frequencies)
         let frequencies: [Float] = [60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000]
         for (index, frequency) in frequencies.enumerated() {
             let band = eqNode!.bands[index]

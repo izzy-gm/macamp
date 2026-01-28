@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A10000001 /* WinampApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000001 /* WinampApp.swift */; };
+		A10000001 /* MacAmpApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000001 /* MacAmpApp.swift */; };
 		A10000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000002 /* ContentView.swift */; };
 		A10000003 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000003 /* AudioPlayer.swift */; };
 		A10000004 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000004 /* Track.swift */; };
@@ -17,14 +17,14 @@
 		A10000007 /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000007 /* PlaylistView.swift */; };
 		A10000008 /* EqualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000008 /* EqualizerView.swift */; };
 		A10000009 /* SpectrumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000009 /* SpectrumView.swift */; };
-		A10000010 /* WinampColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010 /* WinampColors.swift */; };
+		A10000010 /* MacAmpColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010 /* MacAmpColors.swift */; };
 		A10000011 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000011 /* Assets.xcassets */; };
 		A10000012 /* startup.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A20000013 /* startup.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A10000000 /* Winamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Winamp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A20000001 /* WinampApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinampApp.swift; sourceTree = "<group>"; };
+		A20000001 /* MacAmpApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAmpApp.swift; sourceTree = "<group>"; };
 		A20000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A20000003 /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		A20000004 /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
@@ -34,7 +34,7 @@
 		A20000007 /* PlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistView.swift; sourceTree = "<group>"; };
 		A20000008 /* EqualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualizerView.swift; sourceTree = "<group>"; };
 		A20000009 /* SpectrumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumView.swift; sourceTree = "<group>"; };
-		A20000010 /* WinampColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinampColors.swift; sourceTree = "<group>"; };
+		A20000010 /* MacAmpColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAmpColors.swift; sourceTree = "<group>"; };
 		A20000011 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A20000012 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A20000013 /* startup.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = startup.mp3; sourceTree = "<group>"; };
@@ -63,7 +63,7 @@
 		A40000002 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				A20000001 /* WinampApp.swift */,
+				A20000001 /* MacAmpApp.swift */,
 				A20000002 /* ContentView.swift */,
 				A20000003 /* AudioPlayer.swift */,
 				A20000004 /* Track.swift */,
@@ -73,7 +73,7 @@
 				A20000007 /* PlaylistView.swift */,
 				A20000008 /* EqualizerView.swift */,
 				A20000009 /* SpectrumView.swift */,
-				A20000010 /* WinampColors.swift */,
+				A20000010 /* MacAmpColors.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -160,7 +160,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10000001 /* WinampApp.swift in Sources */,
+				A10000001 /* MacAmpApp.swift in Sources */,
 				A10000002 /* ContentView.swift in Sources */,
 				A10000003 /* AudioPlayer.swift in Sources */,
 				A10000004 /* Track.swift in Sources */,
@@ -170,7 +170,7 @@
 				A10000007 /* PlaylistView.swift in Sources */,
 				A10000008 /* EqualizerView.swift in Sources */,
 				A10000009 /* SpectrumView.swift in Sources */,
-				A10000010 /* WinampColors.swift in Sources */,
+				A10000010 /* MacAmpColors.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

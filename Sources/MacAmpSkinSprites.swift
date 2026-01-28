@@ -1,13 +1,13 @@
 import SwiftUI
 import AppKit
 
-// Classic Winamp skin sprite coordinates
-// Based on the standard Winamp Base skin layout
-struct WinampSkinSprites {
-    static let shared = WinampSkinSprites()
+// Classic MacAmp skin sprite coordinates
+// Based on the standard MacAmp Base skin layout
+struct MacAmpSkinSprites {
+    static let shared = MacAmpSkinSprites()
     
     // Load the main skin image
-    private let skinImage: NSImage? = NSImage(named: "WinampSkin")
+    private let skinImage: NSImage? = NSImage(named: "MacAmpSkin")
     
     // Main window components (from main.bmp coordinates)
     struct MainWindow {
@@ -85,7 +85,7 @@ struct SkinSpriteView: View {
     let rect: CGRect
     
     var body: some View {
-        if let image = WinampSkinSprites.shared.getSpriteImage(rect: rect) {
+        if let image = MacAmpSkinSprites.shared.getSpriteImage(rect: rect) {
             image
                 .resizable()
                 .interpolation(.none) // Pixel-perfect scaling

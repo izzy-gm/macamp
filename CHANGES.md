@@ -16,12 +16,12 @@
 ### ✅ Frameless Window
 - Removed macOS window chrome completely
 - No red/yellow/green buttons visible
-- Custom Winamp-style window controls work
+- Custom MacAmp-style window controls work
 - Draggable blue title bar
 
 ### 🎨 Sprite System Created
-- Added `WinampSkinSprites.swift` for using actual graphics
-- Imported your Winamp skin image as `WinampSkin` asset
+- Added `MacAmpSkinSprites.swift` for using actual graphics
+- Imported your MacAmp skin image as `MacAmpSkin` asset
 - Defined sprite coordinates for all UI elements:
   - Buttons (Previous, Play, Pause, Stop, Next, Eject)
   - Toggle buttons (EQ, PL, Shuffle, Repeat) 
@@ -30,7 +30,7 @@
 
 ## Next Steps
 
-To fully use the actual Winamp graphics, we need to:
+To fully use the actual MacAmp graphics, we need to:
 
 1. **Extract button sprites** from the skin image at specific coordinates
 2. **Replace SwiftUI buttons** with bitmap images
@@ -41,8 +41,8 @@ The sprite system is ready - we just need to integrate it with the button views.
 
 ## How to Test
 
-1. Build: `xcodebuild -project Winamp.xcodeproj -scheme Winamp build`
-2. Run: `open ~/Library/Developer/Xcode/DerivedData/Winamp-*/Build/Products/Debug/Winamp.app`
+1. Build: `xcodebuild -project MacAmp.xcodeproj -scheme MacAmp build`
+2. Run: `open ~/Library/Developer/Xcode/DerivedData/MacAmp-*/Build/Products/Debug/MacAmp.app`
 3. Test PL button to toggle playlist
 4. Verify no black space around window edges
 5. Check that window is exactly 275px wide

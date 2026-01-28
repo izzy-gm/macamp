@@ -2,13 +2,13 @@ import SwiftUI
 import AppKit
 
 @main
-struct WinampApp: App {
+struct MacAmpApp: App {
     @StateObject private var audioPlayer = AudioPlayer.shared
     @StateObject private var playlistManager = PlaylistManager.shared
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        Window("Winamp", id: "main-window") {
+        Window("MacAmp", id: "main-window") {
             // Use your real ContentView here - unchanged.
             ContentView()
                 .environmentObject(audioPlayer)

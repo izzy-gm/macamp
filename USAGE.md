@@ -1,18 +1,18 @@
-# Winamp macOS - Usage Guide
+# MacAmp macOS - Usage Guide
 
-Welcome to Winamp macOS! This guide will help you get started with your nostalgic music player.
+Welcome to MacAmp macOS! This guide will help you get started with your nostalgic music player.
 
 ## Getting Started
 
 ### Opening the Application
 
-1. Open `Winamp.xcodeproj` in Xcode
-2. Build and run (⌘R) or use the command line: `xcodebuild -project Winamp.xcodeproj -scheme Winamp -configuration Debug build`
-3. The application will launch with the classic Winamp interface
+1. Open `MacAmp.xcodeproj` in Xcode
+2. Build and run (⌘R) or use the command line: `xcodebuild -project MacAmp.xcodeproj -scheme MacAmp -configuration Debug build`
+3. The application will launch with the classic MacAmp interface
 
 ### First Time Setup
 
-When you first launch Winamp, you'll see:
+When you first launch MacAmp, you'll see:
 - Main player window with controls
 - An empty playlist
 - The spectrum analyzer
@@ -59,7 +59,7 @@ When you first launch Winamp, you'll see:
 
 The main player window (275px wide) features:
 
-1. **Title Bar**: Shows "Winamp" with the classic blue gradient
+1. **Title Bar**: Shows "MacAmp" with the classic blue gradient
 2. **Display Area**: Shows currently playing track title and artist
 3. **Spectrum Analyzer**: 20-band visual frequency display
 4. **Time Display**: Shows current time / total duration
@@ -105,11 +105,11 @@ Each band can be adjusted from -12dB to +12dB.
 
 ### Spectrum Analyzer
 
-Real-time 20-band frequency visualization in classic Winamp green. The bars animate based on the music being played.
+Real-time 20-band frequency visualization in classic MacAmp green. The bars animate based on the music being played.
 
 ## Color Scheme
 
-Winamp macOS uses the classic color palette:
+MacAmp macOS uses the classic color palette:
 
 - **Background**: Black
 - **Title Bar**: Blue gradient (#163862 → #2659A5)
@@ -134,7 +134,7 @@ The player reads and displays:
 
 ## Tips and Tricks
 
-1. **Window Management**: The main player window has a fixed width (275px) to maintain the classic Winamp look, but the playlist and equalizer can be toggled on/off.
+1. **Window Management**: The main player window has a fixed width (275px) to maintain the classic MacAmp look, but the playlist and equalizer can be toggled on/off.
 
 2. **Playlist Organization**: Tracks are played in the order they appear in the playlist. Currently, there's no shuffle or repeat mode (feel free to add these features!).
 
@@ -181,11 +181,11 @@ The app requests:
 Want to contribute or customize?
 
 ### Key Files
-- `WinampApp.swift`: Application entry point
+- `MacAmpApp.swift`: Application entry point
 - `AudioPlayer.swift`: Core audio engine
 - `PlaylistManager.swift`: Playlist logic
 - `MainPlayerView.swift`: Main UI
-- `WinampColors.swift`: Color definitions
+- `MacAmpColors.swift`: Color definitions
 
 ### Adding Features
 
@@ -204,7 +204,7 @@ Some ideas for enhancements:
 
 ## Credits
 
-Built with ❤️ as a tribute to the legendary Winamp player that shaped a generation of music lovers.
+Built with ❤️ as a tribute to the legendary MacAmp player that shaped a generation of music lovers.
 
 "It really whips the llama's ass!" - Justin Frankel
 

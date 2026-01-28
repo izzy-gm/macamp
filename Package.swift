@@ -2,17 +2,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "Winamp",
+    name: "MacAmp",
     platforms: [
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "Winamp", targets: ["Winamp"])
+        .executable(name: "MacAmp", targets: ["MacAmp"])
     ],
     dependencies: [],
     targets: [
         .executableTarget(
-            name: "Winamp",
+            name: "MacAmp",
             dependencies: [],
             path: "Sources"
         )

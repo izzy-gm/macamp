@@ -11,14 +11,14 @@ struct EqualizerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Classic Winamp EQ header
+            // Classic MacAmp EQ header
             HStack(spacing: 3) {
                 Image(systemName: "waveform")
                     .font(.system(size: 7, weight: .bold))
                     .foregroundColor(.white)
                     .frame(width: 9, height: 9)
                 
-                Text("Winamp Equalizer")
+                Text("MacAmp Equalizer")
                     .font(.system(size: 9, weight: .regular))
                     .foregroundColor(.white)
                 
@@ -30,7 +30,7 @@ struct EqualizerView: View {
             .frame(height: 14)
             .background(
                 LinearGradient(
-                    colors: [WinampColors.titleBarHighlight, WinampColors.titleBar],
+                    colors: [MacAmpColors.titleBarHighlight, MacAmpColors.titleBar],
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -41,8 +41,8 @@ struct EqualizerView: View {
                 // ON/AUTO buttons and PRESETS
                 HStack {
                     HStack(spacing: 2) {
-                        WinampToggle(text: "ON", isOn: $eqOn, width: 25)
-                        WinampToggle(text: "AUTO", isOn: $autoOn, width: 44)
+                        MacAmpToggle(text: "ON", isOn: $eqOn, width: 25)
+                        MacAmpToggle(text: "AUTO", isOn: $autoOn, width: 44)
                     }
                     
                     Spacer()
@@ -66,15 +66,15 @@ struct EqualizerView: View {
                     VStack(spacing: 0) {
                         Text("+12db")
                             .font(.system(size: 6, design: .monospaced))
-                            .foregroundColor(WinampColors.displayText)
+                            .foregroundColor(MacAmpColors.displayText)
                         Spacer()
                         Text("+0db")
                             .font(.system(size: 6, design: .monospaced))
-                            .foregroundColor(WinampColors.displayText)
+                            .foregroundColor(MacAmpColors.displayText)
                         Spacer()
                         Text("-12db")
                             .font(.system(size: 6, design: .monospaced))
-                            .foregroundColor(WinampColors.displayText)
+                            .foregroundColor(MacAmpColors.displayText)
                         Spacer().frame(height: 10) // for frequency labels
                     }
                     .frame(width: 35, height: 110)
@@ -114,7 +114,7 @@ struct EqualizerView: View {
                                 
                                 Text(frequencies[index])
                                     .font(.system(size: 6, design: .monospaced))
-                                    .foregroundColor(WinampColors.displayText)
+                                    .foregroundColor(MacAmpColors.displayText)
                             }
                             .frame(maxWidth: .infinity)
                             
@@ -126,7 +126,7 @@ struct EqualizerView: View {
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
-                .background(WinampColors.mainBgDark)
+                .background(MacAmpColors.mainBgDark)
                 
                 // Reset button
                 HStack {
@@ -138,10 +138,10 @@ struct EqualizerView: View {
                 .padding(.horizontal, 8)
                 .padding(.bottom, 4)
             }
-            .background(WinampColors.mainBg)
+            .background(MacAmpColors.mainBg)
         }
         .frame(width: 450)
-        .background(WinampColors.mainBgDark)
+        .background(MacAmpColors.mainBgDark)
     }
     
     private func resetEqualizer() {
@@ -171,7 +171,7 @@ struct ClassicEQSlider: View {
                         RoundedRectangle(cornerRadius: 1)
                             .strokeBorder(
                                 LinearGradient(
-                                    colors: [WinampColors.borderDark, WinampColors.borderLight.opacity(0.2)],
+                                    colors: [MacAmpColors.borderDark, MacAmpColors.borderLight.opacity(0.2)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
@@ -229,7 +229,7 @@ struct ClassicEQSlider: View {
                     RoundedRectangle(cornerRadius: 3)
                         .fill(
                             LinearGradient(
-                                colors: [WinampColors.buttonLight, WinampColors.buttonFace],
+                                colors: [MacAmpColors.buttonLight, MacAmpColors.buttonFace],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
@@ -331,7 +331,7 @@ struct FrequencyResponseGraph: View {
             // Draw the curve with yellow/green color
             context.stroke(
                 curvePath,
-                with: .color(WinampColors.displayText),
+                with: .color(MacAmpColors.displayText),
                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round)
             )
         }

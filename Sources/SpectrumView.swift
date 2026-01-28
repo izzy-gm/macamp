@@ -327,9 +327,9 @@ struct SpectrumBar: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            WinampColors.spectrumDot,
-                            WinampColors.spectrumDot.opacity(0.7),
-                            WinampColors.spectrumDot.opacity(0.4)
+                            MacAmpColors.spectrumDot,
+                            MacAmpColors.spectrumDot.opacity(0.7),
+                            MacAmpColors.spectrumDot.opacity(0.4)
                         ],
                         startPoint: .bottom,
                         endPoint: .top

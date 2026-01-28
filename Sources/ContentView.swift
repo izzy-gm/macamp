@@ -16,7 +16,7 @@ struct ContentView: View {
     
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            // Main Winamp player (left side) - hide when visualization is fullscreen
+            // Main MacAmp player (left side) - hide when visualization is fullscreen
             if !visualizerFullscreen {
                 VStack(spacing: 0) {
                     if isShadeMode {
