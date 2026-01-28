@@ -1,75 +1,63 @@
-# Winamp macOS
+# MacAmp
 
-A native macOS application that recreates the classic Winamp experience for playing MP3 and FLAC audio files.
-
-## Full Screen
-
-![Fullscreen Visualizer](fullscreen.png)
-
-<img width="1051" height="633" alt="Screenshot 2025-11-09 at 3 37 26 PM" src="https://github.com/user-attachments/assets/a28d06b8-e427-4ed4-9547-84072368907a" />
-
-
-## Minimized (Playlist + Main Window independently)
-
-![Minimized Playlist](minimized.png)
-
-## Releases / Download
-
-[Releases](https://github.com/mgreenwood1001/winamp/releases)
-
-# Support
-
-If you enjoy using Winamp macOS and would like to support its development, consider buying me a coffee:
-
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/mgreenwood)
-
-[Support on Buy Me a Coffee](https://buymeacoffee.com/mgreenwood)
+A native macOS music player inspired by the classic Winamp. Built with SwiftUI and AVFoundation with no external dependencies.
 
 ## Features
 
-- 🎵 MP3 and FLAC playback support
-- 🎨 Winamp-inspired UI
-- 📝 Playlist management / M3U
-- ⏯️ Full playback controls (play, pause, stop, next, previous)
-- 📊 Spectrum analyzer visualization
-- 🎚️ 10-band equalizer
-- 🔍 File browser with drag-and-drop support
-
-- Multiple oscilliscope visualizations
-- Milkdrop (click on the icon in the main app) - supports fullscreen mode
-- Lyrics overlay in Milkdrop
+- Multi-format playback: MP3, FLAC, WAV, M4A, AAC, AIFF
+- Classic Winamp-inspired interface
+- Real-time spectrum analyzer with FFT visualization
+- 10-band equalizer
+- Playlist management with M3U import/export
+- Drag-and-drop playlist reordering
+- Shuffle and repeat modes
+- Multiple oscilloscope visualizations
+- Milkdrop visualizer with fullscreen support
+- Lyrics overlay (LRC format)
+- Single-instance app behavior
+- Keyboard shortcuts for playback control
 
 ## Requirements
 
 - macOS 13.0 or later
-- Xcode 15.0 or later
+- Xcode 15.0 or later (for building)
 
 ## Building
 
+### Using the build script
+
+```bash
+# Build and run (debug)
+./build.sh --run
+
+# Build release
+./build.sh --release
+
+# Clean build
+./build.sh --clean --run
+```
+
 ### Using Xcode
+
 1. Open `Winamp.xcodeproj` in Xcode
 2. Select the Winamp scheme
-3. Build and run (⌘R)
+3. Build and run (Cmd+R)
 
-alternatively
+## Keyboard Shortcuts
 
-```bash
-./build.sh --run
-```
-
-### Using Swift Package Manager
-```bash
-swift build
-swift run
-```
-
-alternatively
-
-```bash
-./build.sh --release
-```
+| Key | Action |
+|-----|--------|
+| X | Play/Pause |
+| V | Stop |
+| Z | Previous Track |
+| B | Next Track |
+| Cmd+L | Add Files |
+| Cmd+Shift+L | Add Folder |
 
 ## License
 
 MIT License - Feel free to use and modify as needed.
 
+## Acknowledgements
+
+Based on original work by [mgreenwood1001](https://github.com/mgreenwood1001).

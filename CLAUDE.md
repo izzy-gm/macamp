@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Native macOS music player recreating the classic Winamp experience. Built with SwiftUI and AVFoundation (no external dependencies).
+MacAmp - Native macOS music player inspired by the classic Winamp. Built with SwiftUI and AVFoundation (no external dependencies).
 
 - **Requirements**: macOS 13.0+, Xcode 15.0+
 - **Current Version**: 1.1.0
