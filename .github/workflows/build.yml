@@ -38,12 +38,12 @@ jobs:
             echo "🔄 Bumping version for main branch..."
             chmod +x ./bump-version.sh
             ./bump-version.sh patch
-            VERSION=$(grep -A 1 "MARKETING_VERSION" "Winamp.xcodeproj/project.pbxproj" | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?" | head -n 1)
+            VERSION=$(grep -A 1 "MARKETING_VERSION" "Macamp.xcodeproj/project.pbxproj" | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?" | head -n 1)
             echo "version=$VERSION" >> $GITHUB_OUTPUT
             echo "📦 Bumped version to: $VERSION"
           else
             echo "📋 Extracting version for feature branch..."
-            VERSION=$(grep -A 1 "MARKETING_VERSION" "Winamp.xcodeproj/project.pbxproj" | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?" | head -n 1)
+            VERSION=$(grep -A 1 "MARKETING_VERSION" "Macamp.xcodeproj/project.pbxproj" | grep -oE "[0-9]+\.[0-9]+(\.[0-9]+)?" | head -n 1)
             echo "version=$VERSION" >> $GITHUB_OUTPUT
             echo "📦 Current version: $VERSION"
           fi
@@ -56,7 +56,7 @@ jobs:
       - name: Find built app
         id: find_app
         run: |
-          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData/Winamp-*/Build/Products/Release/Winamp.app -maxdepth 0 2>/dev/null | head -n 1)
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData/Macamp-*/Build/Products/Release/Macamp.app -maxdepth 0 2>/dev/null | head -n 1)
           if [ -z "$APP_PATH" ]; then
             echo "❌ Could not find built application!"
             exit 1
@@ -77,8 +77,8 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Winamp-${{ steps.get_version.outputs.version }}.dmg
-          path: release/Winamp-${{ steps.get_version.outputs.version }}.dmg
+          name: Macamp-${{ steps.get_version.outputs.version }}.dmg
+          path: release/Macamp-${{ steps.get_version.outputs.version }}.dmg
           retention-days: 30
       
       - name: Check if tag exists
@@ -100,8 +100,8 @@ jobs:
           
           # Check if version was bumped (compare with what was checked out)
           git fetch origin main || true
-          if git diff HEAD Winamp.xcodeproj/project.pbxproj | grep -q "MARKETING_VERSION"; then
-            git add Winamp.xcodeproj/project.pbxproj
+          if git diff HEAD Macamp.xcodeproj/project.pbxproj | grep -q "MARKETING_VERSION"; then
+            git add Macamp.xcodeproj/project.pbxproj
             VERSION="${{ steps.get_version.outputs.version }}"
             git commit -m "Bump version to $VERSION [skip ci]"
             git push origin main
@@ -122,9 +122,9 @@ jobs:
           
           # Create GitHub release
           gh release create "$TAG" \
-            --title "Winamp $TAG" \
+            --title "Macamp $TAG" \
             --notes "Release $TAG - Built from commit ${{ github.sha }}" \
-            "release/Winamp-${VERSION}.dmg"
+            "release/Macamp-${VERSION}.dmg"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
