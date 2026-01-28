@@ -12,19 +12,19 @@ struct MainPlayerView: View {
     @Binding var repeatEnabled: Bool
     @Binding var songDisplayMode: DisplayMode
     @Binding var showRemainingTime: Bool
-    
+
     @State private var seekDragging = false
     @State private var seekDragPercent: Double = 0
     @AppStorage("visualizationMode") private var visualizationMode: Int = 0
     @State private var showingSongInfo = false
     @State private var autoToggleMode = false
     @State private var autoToggleTimer: Timer?
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Classic MacAmp title bar with logo
             ClassicTitleBar(isShadeMode: $isShadeMode)
-            
+
             // Main content area - matching reference layout exactly
             VStack(spacing: 0) {
                 // Top section: Spectrum on left, song info on right
@@ -34,7 +34,7 @@ struct MainPlayerView: View {
                         // Time display with play/pause indicator - aligned right
                         HStack(spacing: 4) {
                             Spacer()
-                            
+
                             // Play/Pause button
                             Button(action: {
                                 if audioPlayer.isPlaying {
@@ -49,7 +49,7 @@ struct MainPlayerView: View {
                                     .frame(width: 16, height: 16)
                             }
                             .buttonStyle(.plain)
-                            
+
                             Text(formatTime(showRemainingTime ? -(audioPlayer.duration - audioPlayer.currentTime) : audioPlayer.currentTime, showNegative: showRemainingTime))
                                 .font(.system(size: 22, weight: .bold, design: .monospaced))
                                 .foregroundColor(MacAmpColors.displayText)
@@ -62,7 +62,7 @@ struct MainPlayerView: View {
                         .padding(.horizontal, 6)
                         .padding(.vertical, 3)
                         .background(Color.black)
-                        
+
                         // Spectrum visualizer with letters on the left
                         HStack(spacing: 0) {
                             // Letters vertically on the left
@@ -75,7 +75,7 @@ struct MainPlayerView: View {
                                         .foregroundColor(Color(white: 0.4))
                                 }
                                 .buttonStyle(.plain)
-                                
+
                                 Button(action: {
                                     visualizationMode = 0 // Analyzer bars
                                 }) {
@@ -84,7 +84,7 @@ struct MainPlayerView: View {
                                         .foregroundColor(Color(white: 0.4))
                                 }
                                 .buttonStyle(.plain)
-                                
+
                                 Button(action: {
                                     showingSongInfo = true
                                     // Hide after 3 seconds
@@ -97,11 +97,11 @@ struct MainPlayerView: View {
                                         .foregroundColor(Color(white: 0.4))
                                 }
                                 .buttonStyle(.plain)
-                                
+
                                 Text("D")
                                     .font(.system(size: 9, weight: .bold, design: .monospaced))
                                     .foregroundColor(Color(white: 0.4))
-                                
+
                                 Button(action: {
                                     autoToggleMode.toggle()
                                     if autoToggleMode {
@@ -115,7 +115,7 @@ struct MainPlayerView: View {
                                         .foregroundColor(Color(white: 0.4))
                                 }
                                 .buttonStyle(.plain)
-                                
+
                                 Text("V")
                                     .font(.system(size: 9, weight: .bold, design: .monospaced))
                                     .foregroundColor(Color(white: 0.4))
@@ -123,7 +123,7 @@ struct MainPlayerView: View {
                             .frame(width: 14)
                             .padding(.leading, 4)
                             .offset(y: -15)
-                            
+
                             // Blue dotted vertical line separator
                             Canvas { context, size in
                                 let dotSpacing: CGFloat = 3
@@ -137,7 +137,7 @@ struct MainPlayerView: View {
                                 }
                             }
                             .frame(width: 1)
-                            
+
                             // Visualizer
                             ClassicVisualizerView()
                                 .background(Color.black)
@@ -165,7 +165,7 @@ struct MainPlayerView: View {
                             )
                     )
                     .cornerRadius(4)
-                    
+
                     // RIGHT: Song info, bitrate, sliders, and buttons
                     VStack(spacing: 4) {
                     // Song title display with animated visualization or song info
@@ -195,7 +195,7 @@ struct MainPlayerView: View {
                         .background(Color(red: 0.1, green: 0.12, blue: 0.18))
                         .cornerRadius(3)
                     }
-                        
+
                         // Bitrate and format info row
                         HStack(spacing: 4) {
                             // Bitrate display with recessed effect
@@ -221,11 +221,11 @@ struct MainPlayerView: View {
                                         )
                                 )
                                 .cornerRadius(3)
-                            
+
                             Text("kbps")
                                 .font(.system(size: 9, weight: .medium))
                                 .foregroundColor(Color.white.opacity(0.7))
-                            
+
                             // Sample rate display with recessed effect
                             Text("\(Int(audioPlayer.currentSampleRate / 1000))")
                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
@@ -249,23 +249,23 @@ struct MainPlayerView: View {
                                         )
                                 )
                                 .cornerRadius(3)
-                            
+
                             Text("kHz")
                                 .font(.system(size: 9, weight: .medium))
                                 .foregroundColor(Color.white.opacity(0.7))
-                            
+
                             Spacer()
-                            
+
                             Text("mono")
                                 .font(.system(size: 9, weight: .medium))
                                 .foregroundColor(Color.white.opacity(0.5))
-                            
+
                             Text("stereo")
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundColor(MacAmpColors.displayText)
                         }
                         .padding(.horizontal, 4)
-                        
+
                         // Volume slider and EQ/PL buttons
                         HStack(spacing: 4) {
                             // Volume slider (green to red)
@@ -278,9 +278,9 @@ struct MainPlayerView: View {
                                 color: MacAmpColors.displayText
                             )
                             .frame(width: 100, height: 12)
-                            
+
                             Spacer()
-                            
+
                             // EQ and PL buttons with indicator lights
                             HStack(spacing: 2) {
                                 ModernToggleButtonWithLight(text: "EQ", isOn: $showEqualizer)
@@ -292,7 +292,7 @@ struct MainPlayerView: View {
                 .padding(.horizontal, 8)
                 .padding(.top, 6)
                 .padding(.bottom, 4)
-                
+
                 // Large progress bar with 3D inset effect
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
@@ -316,7 +316,7 @@ struct MainPlayerView: View {
                                         lineWidth: 2
                                     )
                             )
-                        
+
                         // Progress fill with raised 3D effect (orange/yellow gradient)
                         RoundedRectangle(cornerRadius: 7)
                             .fill(
@@ -374,7 +374,7 @@ struct MainPlayerView: View {
                 .frame(height: 20)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 6)
-                
+
                 // Control buttons row
                 HStack(spacing: 4) {
                     // Main playback controls
@@ -385,18 +385,18 @@ struct MainPlayerView: View {
                         MacAmpButton(icon: "⏹", width: 32) { audioPlayer.stop() }
                         MacAmpButton(icon: "⏭", width: 32) { playlistManager.next() }
                     }
-                    
+
                     // Eject/Open button
                     MacAmpButton(icon: "⏏", width: 32) { playlistManager.showFilePicker() }
-                    
+
                     Spacer()
-                    
+
                     // Shuffle and Repeat buttons
                     HStack(spacing: 2) {
                         MacAmpToggle(text: "SHUFFLE", isOn: $shuffleEnabled, width: 60)
                         MacAmpToggle(text: "REPEAT", isOn: $repeatEnabled, width: 50)
                     }
-                    
+
                     // Visualization toggle button with icon
                     Button(action: { showVisualization.toggle() }) {
                         ZStack {
@@ -441,7 +441,7 @@ struct MainPlayerView: View {
             stopAutoToggle()
         }
     }
-    
+
     private func formatTime(_ time: TimeInterval, showNegative: Bool = false) -> String {
         let absTime = abs(time)
         let minutes = Int(absTime) / 60
@@ -449,14 +449,14 @@ struct MainPlayerView: View {
         let prefix = showNegative ? "-" : ""
         return String(format: "%@%d:%02d", prefix, minutes, seconds)
     }
-    
+
     private func startAutoToggle() {
         // Toggle every 5 seconds
         autoToggleTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
             visualizationMode = visualizationMode == 0 ? 1 : 0
         }
     }
-    
+
     private func stopAutoToggle() {
         autoToggleTimer?.invalidate()
         autoToggleTimer = nil
@@ -468,10 +468,10 @@ struct MainPlayerView: View {
 final class DraggableWindowView: NSView {
     override func mouseDown(with event: NSEvent) {
         guard let window = self.window else { return }
-        
+
         // Convert event location to view coordinates
         let locationInView = self.convert(event.locationInWindow, from: nil)
-        
+
         // Check if click is in the right side where buttons are (approximately last 60 points)
         // Buttons are on the right side, so exclude that area
         if bounds.width > 0 {
@@ -483,18 +483,18 @@ final class DraggableWindowView: NSView {
                 return
             }
         }
-        
+
         if event.clickCount == 2 {
             window.performMiniaturize(nil)
             return
         }
         window.performDrag(with: event)
     }
-    
+
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
         return true
     }
-    
+
     override func hitTest(_ point: NSPoint) -> NSView? {
         // Check if point is in button area - if so, return nil to let SwiftUI handle it
         if bounds.width > 0 {
@@ -515,7 +515,7 @@ struct DraggableWindowViewRepresentable: NSViewRepresentable {
         view.layer?.backgroundColor = NSColor.clear.cgColor
         return view
     }
-    
+
     func updateNSView(_ nsView: DraggableWindowView, context: Context) {
         // No updates needed
     }
@@ -524,7 +524,7 @@ struct DraggableWindowViewRepresentable: NSViewRepresentable {
 struct ClassicTitleBar: View {
     @Binding var isShadeMode: Bool
     @State private var isDragging = false
-    
+
     var body: some View {
         HStack(spacing: 0) {
             // Left decorative element
@@ -532,7 +532,7 @@ struct ClassicTitleBar: View {
                 .font(.system(size: 8, weight: .bold))
                 .foregroundColor(Color(red: 1.0, green: 0.8, blue: 0.3))
                 .frame(width: 20)
-            
+
             // Decorative lines
             Rectangle()
                 .fill(LinearGradient(
@@ -541,17 +541,17 @@ struct ClassicTitleBar: View {
                     endPoint: .trailing
                 ))
                 .frame(width: 50, height: 1)
-            
+
             Spacer().frame(width: 10)
-            
+
             // Title text
-            Text("WINAMP")
+            Text("MACAMP")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundColor(.white)
                 .tracking(2)
-            
+
             Spacer()
-            
+
             // Decorative lines
             Rectangle()
                 .fill(LinearGradient(
@@ -560,7 +560,7 @@ struct ClassicTitleBar: View {
                     endPoint: .trailing
                 ))
                 .frame(width: 50, height: 1)
-            
+
             // Modern window controls (matching the image style)
             HStack(spacing: 2) {
                 ModernWindowButton(icon: "○", tooltip: "Minimize", action: .minimize, isShadeMode: $isShadeMode)
@@ -595,7 +595,7 @@ struct ModernWindowButton: View {
     let action: WindowControlAction
     @Binding var isShadeMode: Bool
     @State private var isHovered = false
-    
+
     var body: some View {
         Button(action: performAction) {
             Text(icon)
@@ -613,10 +613,10 @@ struct ModernWindowButton: View {
             isHovered = hovering
         }
     }
-    
+
     func performAction() {
         guard let window = NSApplication.shared.windows.first else { return }
-        
+
         switch action {
         case .minimize:
             window.miniaturize(nil)
@@ -641,12 +641,12 @@ struct ShadeView: View {
     @Binding var isShadeMode: Bool
     @Binding var songDisplayMode: DisplayMode
     @Binding var showRemainingTime: Bool
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Title bar (draggable)
             ClassicTitleBar(isShadeMode: $isShadeMode)
-            
+
             // Compact shade content with 3D effects
             HStack(spacing: 6) {
                 // Mini spectrum with 3D inset
@@ -667,25 +667,25 @@ struct ShadeView: View {
                     )
                     .cornerRadius(3)
                     .shadow(color: Color.black.opacity(0.3), radius: 1, x: 0, y: 1)
-                
+
                 // Playback control buttons
                 HStack(spacing: 2) {
                     // Previous button
                     ShadeButton(icon: "⏮") {
                         playlistManager.previous()
                     }
-                    
+
                     // Play/Pause button
                     ShadeButton(icon: audioPlayer.isPlaying ? "⏸" : "▶") {
                         audioPlayer.togglePlayPause()
                     }
-                    
+
                     // Next button
                     ShadeButton(icon: "⏭") {
                         playlistManager.next()
                     }
                 }
-                
+
                 // Time display with 3D inset
                 Text(formatTime(showRemainingTime ? -(audioPlayer.duration - audioPlayer.currentTime) : audioPlayer.currentTime, showNegative: showRemainingTime))
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
@@ -712,7 +712,7 @@ struct ShadeView: View {
                     .onTapGesture {
                         showRemainingTime.toggle()
                     }
-                
+
                 // Song title with animated visualization
                 AnimatedSongDisplay(
                     artist: playlistManager.currentTrack?.artist ?? "DJ Mike Llama",
@@ -771,7 +771,7 @@ struct ShadeView: View {
             }
         }
     }
-    
+
     func formatTime(_ time: TimeInterval, showNegative: Bool = false) -> String {
         let absTime = abs(time)
         let minutes = Int(absTime) / 60
@@ -787,7 +787,7 @@ struct ShadeButton: View {
     let action: () -> Void
     @State private var isPressed = false
     @State private var isHovered = false
-    
+
     var body: some View {
         Button(action: {
             isPressed = true
@@ -816,7 +816,7 @@ struct ShadeButton: View {
                                     endPoint: .bottom
                                 )
                             )
-                        
+
                         // 3D bevel effect
                         if !isPressed {
                             // Top-left highlight (raised)
@@ -829,7 +829,7 @@ struct ShadeButton: View {
                                     ),
                                     lineWidth: 1.5
                                 )
-                            
+
                             // Bottom-right shadow
                             RoundedRectangle(cornerRadius: 3)
                                 .strokeBorder(
@@ -875,7 +875,7 @@ struct WindowButton: View {
     let icon: String
     let size: CGFloat
     @State private var isPressed = false
-    
+
     var body: some View {
         Text(icon)
             .font(.system(size: size, weight: .bold))
@@ -896,7 +896,7 @@ struct WindowButton: View {
 struct LEDDisplayView: View {
     @EnvironmentObject var playlistManager: PlaylistManager
     @State private var scrollOffset: CGFloat = 0
-    
+
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
@@ -909,7 +909,7 @@ struct LEDDisplayView: View {
                         .padding(.leading, 4)
                         .padding(.vertical, 4)
                 } else {
-                    Text("WINAMP")
+                    Text("MACAMP")
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(MacAmpColors.displayInactive)
                         .padding(.leading, 4)
@@ -952,7 +952,7 @@ struct BitrateDisplayView: View {
 
 struct LEDTimeDisplay: View {
     let time: TimeInterval
-    
+
     var body: some View {
         Text(formatTime(time))
             .font(.system(size: 11, weight: .bold, design: .monospaced))
@@ -964,7 +964,7 @@ struct LEDTimeDisplay: View {
                     .strokeBorder(MacAmpColors.borderDark, lineWidth: 1)
             )
     }
-    
+
     func formatTime(_ time: TimeInterval) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
@@ -978,44 +978,44 @@ struct ClassicControlButtons: View {
     @EnvironmentObject var playlistManager: PlaylistManager
     @Binding var showPlaylist: Bool
     @Binding var showEqualizer: Bool
-    
+
     var body: some View {
         HStack(spacing: 2) {
             // Previous
             MacAmpButton(icon: "⏮", width: 23) {
                 playlistManager.previous()
             }
-            
+
             // Play
             MacAmpButton(icon: "▶", width: 23) {
                 audioPlayer.play()
             }
-            
+
             // Pause
             MacAmpButton(icon: "⏸", width: 23) {
                 audioPlayer.pause()
             }
-            
+
             // Stop
             MacAmpButton(icon: "⏹", width: 23) {
                 audioPlayer.stop()
             }
-            
+
             // Next
             MacAmpButton(icon: "⏭", width: 23) {
                 playlistManager.next()
             }
-            
+
             // Eject (open file)
             MacAmpButton(icon: "⏏", width: 23) {
                 playlistManager.showFilePicker()
             }
-            
+
             Spacer()
-            
+
             // Equalizer toggle
             MacAmpToggle(text: "EQ", isOn: $showEqualizer, width: 23)
-            
+
             // Playlist toggle
             MacAmpToggle(text: "PL", isOn: $showPlaylist, width: 23)
         }
@@ -1028,7 +1028,7 @@ struct MacAmpButton: View {
     let action: () -> Void
     @State private var isPressed = false
     @State private var isHovered = false
-    
+
     var body: some View {
         Button(action: {
             isPressed = true
@@ -1057,7 +1057,7 @@ struct MacAmpButton: View {
                                     endPoint: .bottom
                                 )
                             )
-                        
+
                         // Enhanced 3D bevel effect
                         if !isPressed {
                             // Enhanced raised bevel - bright on top, dark on bottom
@@ -1113,7 +1113,7 @@ struct MacAmpToggle: View {
     let text: String
     @Binding var isOn: Bool
     let width: CGFloat
-    
+
     var body: some View {
         Button(action: {
             isOn.toggle()
@@ -1124,7 +1124,7 @@ struct MacAmpToggle: View {
                     .font(.system(size: 8, weight: .bold))
                     .foregroundColor(.white.opacity(0.9))
                     .frame(width: width, height: 18)
-                
+
                 // Indicator light in top-right corner
                 Rectangle()
                     .fill(isOn ? MacAmpColors.displayText : Color.black)
@@ -1138,7 +1138,7 @@ struct MacAmpToggle: View {
                     // Raised button style
                     RoundedRectangle(cornerRadius: 3)
                         .fill(Color(red: 0.22, green: 0.25, blue: 0.32))
-                    
+
                     // Raised bevel effect - bright top/left, dark bottom/right
                     RoundedRectangle(cornerRadius: 3)
                         .strokeBorder(
@@ -1172,7 +1172,7 @@ struct MonoSlider: View {
     let range: ClosedRange<Double>
     @State private var isDragging = false
     @State private var dragValue: Double = 0
-    
+
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
@@ -1188,12 +1188,12 @@ struct MonoSlider: View {
                             Spacer()
                         }
                     )
-                
+
                 // Position indicator
                 let currentValue = isDragging ? dragValue : value
                 let progress = (currentValue - range.lowerBound) / (range.upperBound - range.lowerBound)
                 let xPosition = CGFloat(progress) * (geometry.size.width - 4)
-                
+
                 Rectangle()
                     .fill(MacAmpColors.displayText)
                     .frame(width: 4, height: 8)
@@ -1220,7 +1220,7 @@ struct MonoSlider: View {
 struct ClutterbarView: View {
     @EnvironmentObject var audioPlayer: AudioPlayer
     @State private var balance: Float = 0.5
-    
+
     var body: some View {
         HStack(spacing: 6) {
             // Volume slider
@@ -1228,7 +1228,7 @@ struct ClutterbarView: View {
                 Text("Volume")
                     .font(.system(size: 5))
                     .foregroundColor(.white.opacity(0.7))
-                
+
                 ClutterbarSlider(
                     value: Binding(
                         get: { audioPlayer.volume },
@@ -1237,15 +1237,15 @@ struct ClutterbarView: View {
                     width: 68
                 )
             }
-            
+
             Spacer()
-            
+
             // Balance slider
             VStack(spacing: 0) {
                 Text("Balance")
                     .font(.system(size: 5))
                     .foregroundColor(.white.opacity(0.7))
-                
+
                 ClutterbarSlider(
                     value: $balance,
                     width: 38
@@ -1259,7 +1259,7 @@ struct ClutterbarSlider: View {
     @Binding var value: Float
     let width: CGFloat
     @State private var isDragging = false
-    
+
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
@@ -1267,10 +1267,10 @@ struct ClutterbarSlider: View {
                 Rectangle()
                     .fill(MacAmpColors.mainBgDark)
                     .frame(height: 4)
-                
+
                 // Thumb
                 let xPosition = CGFloat(value) * (width - 3)
-                
+
                 Rectangle()
                     .fill(MacAmpColors.displayText)
                     .frame(width: 3, height: 6)
@@ -1295,18 +1295,18 @@ struct ClutterbarSlider: View {
 
 struct TimeDisplayView: View {
     @EnvironmentObject var audioPlayer: AudioPlayer
-    
+
     var body: some View {
         HStack(spacing: 4) {
             Text(formatTime(audioPlayer.currentTime))
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                 .foregroundColor(MacAmpColors.displayText)
                 .frame(width: 50, alignment: .trailing)
-            
+
             Text("/")
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                 .foregroundColor(MacAmpColors.displayText.opacity(0.5))
-            
+
             Text(formatTime(audioPlayer.duration))
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                 .foregroundColor(MacAmpColors.displayText.opacity(0.7))
@@ -1316,7 +1316,7 @@ struct TimeDisplayView: View {
         .background(MacAmpColors.displayBg)
         .cornerRadius(2)
     }
-    
+
     private func formatTime(_ time: TimeInterval) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
@@ -1326,20 +1326,20 @@ struct TimeDisplayView: View {
 
 struct VolumeControlView: View {
     @EnvironmentObject var audioPlayer: AudioPlayer
-    
+
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "speaker.fill")
                 .font(.system(size: 10))
                 .foregroundColor(MacAmpColors.displayText)
-            
+
             Slider(value: Binding(
                 get: { audioPlayer.volume },
                 set: { audioPlayer.setVolume($0) }
             ), in: 0...1)
             .accentColor(MacAmpColors.displayText)
             .frame(width: 60)
-            
+
             Text("\(Int(audioPlayer.volume * 100))%")
                 .font(.system(size: 9, design: .monospaced))
                 .foregroundColor(MacAmpColors.displayText)
@@ -1352,7 +1352,7 @@ struct PositionSliderView: View {
     @EnvironmentObject var audioPlayer: AudioPlayer
     @State private var isDragging = false
     @State private var dragValue: Double = 0
-    
+
     var body: some View {
         Slider(
             value: isDragging ? $dragValue : Binding(
@@ -1374,21 +1374,21 @@ struct PositionSliderView: View {
 struct PlaybackControlsView: View {
     @EnvironmentObject var audioPlayer: AudioPlayer
     @EnvironmentObject var playlistManager: PlaylistManager
-    
+
     var body: some View {
         HStack(spacing: 8) {
             ControlButton(icon: "backward.end.fill") {
                 playlistManager.previous()
             }
-            
+
             ControlButton(icon: audioPlayer.isPlaying ? "pause.fill" : "play.fill") {
                 audioPlayer.togglePlayPause()
             }
-            
+
             ControlButton(icon: "stop.fill") {
                 audioPlayer.stop()
             }
-            
+
             ControlButton(icon: "forward.end.fill") {
                 playlistManager.next()
             }
@@ -1400,7 +1400,7 @@ struct ControlButton: View {
     let icon: String
     let action: () -> Void
     @State private var isPressed = false
-    
+
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
@@ -1428,7 +1428,7 @@ struct ControlButton: View {
 struct ToggleButton: View {
     let title: String
     @Binding var isOn: Bool
-    
+
     var body: some View {
         Button(action: { isOn.toggle() }) {
             Text(title)
@@ -1454,11 +1454,11 @@ struct ModernSlider: View {
     let range: ClosedRange<Double>
     let color: Color
     @State private var isDragging = false
-    
+
     var body: some View {
         GeometryReader { geometry in
             let volumePercent = (value - range.lowerBound) / (range.upperBound - range.lowerBound)
-            
+
             // Calculate color based on volume (black at 0, green -> yellow -> red as volume increases)
             let backgroundColor: Color = {
                 if volumePercent <= 0.01 {
@@ -1482,7 +1482,7 @@ struct ModernSlider: View {
                     )
                 }
             }()
-            
+
             ZStack(alignment: .leading) {
                 // Solid color background that changes with volume
                 RoundedRectangle(cornerRadius: 8)
@@ -1504,7 +1504,7 @@ struct ModernSlider: View {
                                 lineWidth: 1.5
                             )
                     )
-                
+
                 // Speaker icon on left side
                 HStack {
                     Image(systemName: "speaker.wave.2.fill")
@@ -1514,10 +1514,10 @@ struct ModernSlider: View {
                         .padding(.leading, 3)
                     Spacer()
                 }
-                
+
                 // Dot slider handle
                 let handleX = (geometry.size.width - 10) * CGFloat(volumePercent)
-                
+
                 Circle()
                     .fill(
                         LinearGradient(
@@ -1560,7 +1560,7 @@ struct ModernSlider: View {
 struct ModernToggleButtonWithLight: View {
     let text: String
     @Binding var isOn: Bool
-    
+
     var body: some View {
         Button(action: { isOn.toggle() }) {
             ZStack(alignment: .topTrailing) {
@@ -1569,7 +1569,7 @@ struct ModernToggleButtonWithLight: View {
                     .font(.system(size: 8, weight: .bold))
                     .foregroundColor(.white.opacity(0.9))
                     .frame(width: 24, height: 20)
-                
+
                 // Indicator light in top-right corner
                 Rectangle()
                     .fill(isOn ? MacAmpColors.displayText : Color.black)
@@ -1583,7 +1583,7 @@ struct ModernToggleButtonWithLight: View {
                     // Raised button style
                     RoundedRectangle(cornerRadius: 3)
                         .fill(Color(red: 0.22, green: 0.25, blue: 0.32))
-                    
+
                     // Raised bevel effect - bright top/left, dark bottom/right
                     RoundedRectangle(cornerRadius: 3)
                         .strokeBorder(
@@ -1624,7 +1624,7 @@ enum VisualizationPreset: Int, CaseIterable {
     case nebulaGalaxy = 8
     case starfieldFlight = 9
     case starWarsCrawl = 10
-    
+
     var name: String {
         switch self {
         case .spiralGalaxy: return "Spiral Galaxy"
@@ -1652,7 +1652,7 @@ struct MilkdropVisualizerView: View {
     @State private var autoChangeTimer: Timer?
     @State private var fadeOpacity: Double = 1.0
     @Binding var isFullscreen: Bool
-    
+
     var body: some View {
         VStack(spacing: 0) {
             // Title bar with preset controls
@@ -1664,14 +1664,14 @@ struct MilkdropVisualizerView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.trailing, 4)
-                
+
                 Text("MILKDROP • \(currentPreset.name)")
                     .font(.system(size: 9, weight: .bold))
                     .foregroundColor(.white)
                     .tracking(1)
-                
+
                 Spacer()
-                
+
                 Button(action: nextPreset) {
                     Text("▶")
                         .font(.system(size: 10, weight: .bold))
@@ -1679,7 +1679,7 @@ struct MilkdropVisualizerView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.leading, 4)
-                
+
                 // Fullscreen button
                 Button(action: toggleFullscreen) {
                     Image(systemName: isFullscreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
@@ -1702,7 +1702,7 @@ struct MilkdropVisualizerView: View {
                     endPoint: .bottom
                 )
             )
-            
+
             // Visualization canvas
             TimelineView(.animation) { timeline in
                 MilkdropCanvas(
@@ -1735,16 +1735,16 @@ struct MilkdropVisualizerView: View {
             stopAutoChangeTimer()
         }
     }
-    
+
     private func toggleFullscreen() {
         DispatchQueue.main.async {
             guard let window = NSApplication.shared.windows.first(where: { $0.isVisible }) else {
                 return
             }
-            
+
             // Get all available screens
             let allScreens = NSScreen.screens
-            
+
             // Find the screen that the window is currently on
             // Check which screen's frame contains the window's center point
             let windowFrame = window.frame
@@ -1752,7 +1752,7 @@ struct MilkdropVisualizerView: View {
                 x: windowFrame.midX,
                 y: windowFrame.midY
             )
-            
+
             // Find the screen that contains the window's center point
             // This is the most reliable way to determine which monitor the window is on
             var targetScreen: NSScreen?
@@ -1763,31 +1763,31 @@ struct MilkdropVisualizerView: View {
                     break
                 }
             }
-            
+
             // Fallback: use window's screen property or main screen
             if targetScreen == nil {
                 targetScreen = window.screen ?? NSScreen.main ?? allScreens.first
             }
-            
+
             guard let screen = targetScreen else {
                 return
             }
-            
+
             if !self.isFullscreen {
                 // Store original frame before going fullscreen
                 UserDefaults.standard.set(NSStringFromRect(windowFrame), forKey: "originalWindowFrame")
-                
+
                 // Toggle state first
                 self.isFullscreen = true
-                
+
                 // Get the screen's full frame (covers entire screen including menu bar area)
                 let screenFrame = screen.frame
-                
+
                 // Set window to exactly match the screen's frame immediately
                 // This ensures it only fullscreens on the current monitor
                 window.setFrame(screenFrame, display: true, animate: false)
                 window.level = .statusBar // Above everything
-                
+
                 // Small delay to verify and correct if needed
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     // Verify the window is on the correct screen
@@ -1799,7 +1799,7 @@ struct MilkdropVisualizerView: View {
                             window.setFrame(newFrame, display: true, animate: false)
                         }
                     }
-                    
+
                     // Ensure window fills the entire screen
                     let currentFrame = window.frame
                     if currentFrame != screenFrame {
@@ -1809,7 +1809,7 @@ struct MilkdropVisualizerView: View {
             } else {
                 // Toggle state first
                 self.isFullscreen = false
-                
+
                 // Small delay to let SwiftUI update the layout
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     // Restore original size and position
@@ -1822,27 +1822,27 @@ struct MilkdropVisualizerView: View {
             }
         }
     }
-    
+
     private func nextPreset() {
         // Manual preset change - restart timer
         stopAutoChangeTimer()
         changePresetWithFade(direction: 1)
         startAutoChangeTimer()
     }
-    
+
     private func previousPreset() {
         // Manual preset change - restart timer
         stopAutoChangeTimer()
         changePresetWithFade(direction: -1)
         startAutoChangeTimer()
     }
-    
+
     private func changePresetWithFade(direction: Int) {
         // Fade out
         withAnimation(.easeOut(duration: 0.5)) {
             fadeOpacity = 0.0
         }
-        
+
         // Change preset after fade out
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             let allPresets = VisualizationPreset.allCases
@@ -1850,14 +1850,14 @@ struct MilkdropVisualizerView: View {
             let newIndex = (currentIndex + direction + allPresets.count) % allPresets.count
             currentPreset = allPresets[newIndex]
             presetChangeTime = Date()
-            
+
             // Fade back in
             withAnimation(.easeIn(duration: 0.5)) {
                 fadeOpacity = 1.0
             }
         }
     }
-    
+
     private func startAutoChangeTimer() {
         // Auto-change preset every 2 minutes (120 seconds)
         autoChangeTimer?.invalidate()
@@ -1865,7 +1865,7 @@ struct MilkdropVisualizerView: View {
             changePresetWithFade(direction: 1)
         }
     }
-    
+
     private func stopAutoChangeTimer() {
         autoChangeTimer?.invalidate()
         autoChangeTimer = nil
@@ -1876,7 +1876,7 @@ struct MilkdropVisualizerView: View {
 struct FullscreenKeyHandler: NSViewRepresentable {
     @Binding var isFullscreen: Bool
     var onToggle: () -> Void
-    
+
     func makeNSView(context: Context) -> NSView {
         let view = KeyHandlerView()
         view.onEscape = {
@@ -1889,20 +1889,20 @@ struct FullscreenKeyHandler: NSViewRepresentable {
         }
         return view
     }
-    
+
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
 class KeyHandlerView: NSView {
     var onEscape: (() -> Void)?
     var onFullscreenToggle: (() -> Void)?
-    
+
     override var acceptsFirstResponder: Bool { true }
-    override var canBecomeKeyView: Bool { 
+    override var canBecomeKeyView: Bool {
         // Don't become key view if a text field is active
         return !isTextFieldFirstResponder()
     }
-    
+
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         // Only become first responder if no text field is currently editing
@@ -1910,19 +1910,19 @@ class KeyHandlerView: NSView {
             window?.makeFirstResponder(self)
         }
     }
-    
+
     override func layout() {
         super.layout()
         // Don't steal focus during layout changes if a text field is active
         // This was causing the playlist search box to lose keyboard input
     }
-    
+
     private func isTextFieldFirstResponder() -> Bool {
         guard let firstResponder = window?.firstResponder else { return false }
         // Check if the first responder is a text field or text view
         return firstResponder is NSText || firstResponder is NSTextView || firstResponder is NSTextField
     }
-    
+
     override func keyDown(with event: NSEvent) {
         // If a text field is currently editing, don't intercept ANY keyboard events
         if isTextFieldFirstResponder() {
@@ -1930,7 +1930,7 @@ class KeyHandlerView: NSView {
             self.nextResponder?.keyDown(with: event)
             return
         }
-        
+
         if event.keyCode == 53 { // Escape key
             onEscape?()
         } else if event.keyCode == 3 { // F key (keyCode 3)
@@ -1944,19 +1944,19 @@ class KeyHandlerView: NSView {
 // Double-click handler view
 struct DoubleClickHandler: NSViewRepresentable {
     let onDoubleClick: () -> Void
-    
+
     func makeNSView(context: Context) -> DoubleClickView {
         let view = DoubleClickView()
         view.onDoubleClick = onDoubleClick
         return view
     }
-    
+
     func updateNSView(_ nsView: DoubleClickView, context: Context) {}
 }
 
 class DoubleClickView: NSView {
     var onDoubleClick: (() -> Void)?
-    
+
     override func mouseDown(with event: NSEvent) {
         if event.clickCount == 2 {
             onDoubleClick?()
@@ -1964,7 +1964,7 @@ class DoubleClickView: NSView {
             super.mouseDown(with: event)
         }
     }
-    
+
     override var acceptsFirstResponder: Bool {
         return true
     }
@@ -1978,21 +1978,21 @@ struct MilkdropCanvas: View {
     let trackChangeTime: Date
     let preset: VisualizationPreset
     let presetChangeTime: Date
-    
+
     var body: some View {
         Canvas { context, size in
             drawVisualization(context: &context, size: size, time: time)
-            
+
             // Only show track title and regular lyrics if NOT in Star Wars mode
             if preset != .starWarsCrawl {
                 drawTrackTitle(context: &context, size: size, time: time)
                 drawLyrics(context: &context, size: size, time: time)
             }
-            
+
             drawPresetChange(context: &context, size: size, time: time)
         }
     }
-    
+
     private func drawVisualization(context: inout GraphicsContext, size: CGSize, time: Double) {
         // Black background with subtle gradient
         let bgGradient = Gradient(colors: [
@@ -2003,10 +2003,10 @@ struct MilkdropCanvas: View {
             Path(CGRect(origin: .zero, size: size)),
             with: .linearGradient(bgGradient, startPoint: .zero, endPoint: CGPoint(x: size.width, y: size.height))
         )
-        
+
         let centerX = size.width / 2
         let centerY = size.height / 2
-        
+
         // Draw based on current preset
         switch preset {
         case .spiralGalaxy:
@@ -2014,43 +2014,43 @@ struct MilkdropCanvas: View {
             drawEnergyRings(context: &context, centerX: centerX, centerY: centerY, time: time)
             drawWaveforms(context: &context, size: size, time: time)
             drawParticles(context: &context, centerX: centerX, centerY: centerY, time: time)
-            
+
         case .oscillatorGrid:
             drawOscillatorGrid(context: &context, size: size, time: time)
-            
+
         case .plasmaField:
             drawPlasmaField(context: &context, size: size, time: time)
-            
+
         case .particleStorm:
             drawParticleStorm(context: &context, centerX: centerX, centerY: centerY, size: size, time: time)
-            
+
         case .frequencyRings:
             drawFrequencyRings(context: &context, centerX: centerX, centerY: centerY, time: time)
-            
+
         case .waveformTunnel:
             drawWaveformTunnel(context: &context, centerX: centerX, centerY: centerY, size: size, time: time)
-            
+
         case .kaleidoscope:
             drawKaleidoscope(context: &context, centerX: centerX, centerY: centerY, size: size, time: time)
-            
+
         case .lfoMorph:
             drawLFOMorph(context: &context, centerX: centerX, centerY: centerY, size: size, time: time)
-            
+
         case .nebulaGalaxy:
             drawNebulaGalaxy(context: &context, centerX: centerX, centerY: centerY, size: size, time: time)
-            
+
         case .starfieldFlight:
             drawStarfieldFlight(context: &context, centerX: centerX, centerY: centerY, size: size, time: time)
-            
+
         case .starWarsCrawl:
             drawStarWarsCrawl(context: &context, size: size, time: time)
         }
     }
-    
+
     private func drawSpiralGalaxy(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double) {
         let avgLevel = audioPlayer.spectrumData.reduce(0, +) / Float(max(audioPlayer.spectrumData.count, 1))
         let intensity = CGFloat(avgLevel) * 2 + 0.5
-        
+
         // Multiple spiral arms
         for arm in 0..<3 {
             for i in 0..<150 {
@@ -2059,18 +2059,18 @@ struct MilkdropCanvas: View {
                 let radius = t * min(size.width, size.height) * 0.4 * intensity
                 let x = centerX + cos(angle) * radius
                 let y = centerY + sin(angle) * radius
-                
+
                 let hue = (t + time * 0.1 + Double(arm) * 0.33).truncatingRemainder(dividingBy: 1.0)
                 let brightness = (1.0 - t) * Double(avgLevel) * 1.2 + 0.3
                 let color = Color(hue: hue, saturation: 0.9, brightness: brightness)
-                
+
                 let particleSize = (1.0 - t) * 6 + 2
                 let rect = CGRect(x: x - particleSize/2, y: y - particleSize/2, width: particleSize, height: particleSize)
                 context.fill(Path(ellipseIn: rect), with: .color(color))
             }
         }
     }
-    
+
     private func drawEnergyRings(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, time: Double) {
         // Pulsing concentric rings based on spectrum
         for (index, level) in audioPlayer.spectrumData.prefix(12).enumerated() {
@@ -2079,144 +2079,144 @@ struct MilkdropCanvas: View {
             let dist = baseDist + CGFloat(level) * 180
             let x = centerX + cos(angle) * dist
             let y = centerY + sin(angle) * dist
-            
+
             // Multiple ring sizes for depth
             for ring in 0..<3 {
                 let radius = CGFloat(level) * 45 + CGFloat(ring) * 15 + 8
                 let opacity = 0.7 - Double(ring) * 0.2
-                
+
                 let hue = Double(index) / 12.0
                 let color = Color(hue: hue, saturation: 1.0, brightness: Double(level) * 0.7 + 0.4)
-                
+
                 let rect = CGRect(x: x - radius, y: y - radius, width: radius * 2, height: radius * 2)
                 context.fill(Path(ellipseIn: rect), with: .color(color.opacity(opacity)))
             }
         }
     }
-    
+
     private func drawWaveforms(context: inout GraphicsContext, size: CGSize, time: Double) {
         // Multiple layered waveforms
         for layer in 0..<3 {
             var path = Path()
             let yOffset = size.height * (0.3 + Double(layer) * 0.2)
             let amplitude: CGFloat = 80
-            
+
             path.move(to: CGPoint(x: 0, y: yOffset))
-            
+
             for x in stride(from: 0, through: size.width, by: 4) {
                 let progress = x / size.width
                 let spectrumIndex = Int(progress * Double(audioPlayer.spectrumData.count))
                 let level = spectrumIndex < audioPlayer.spectrumData.count ? audioPlayer.spectrumData[spectrumIndex] : 0
-                
+
                 let wavePhase = time * (1.5 + Double(layer) * 0.5)
                 let y = yOffset + amplitude * CGFloat(level) * sin(x / 40 + wavePhase)
                 path.addLine(to: CGPoint(x: x, y: y))
             }
-            
+
             let hue = (time * 0.1 + Double(layer) * 0.33).truncatingRemainder(dividingBy: 1.0)
             let color = Color(hue: hue, saturation: 0.9, brightness: 0.8)
             let lineWidth: CGFloat = 3 - CGFloat(layer)
-            
+
             context.stroke(path, with: .color(color.opacity(0.7 - Double(layer) * 0.15)), lineWidth: lineWidth)
         }
     }
-    
+
     private func drawParticles(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, time: Double) {
         // Floating particles that react to music
         let avgLevel = audioPlayer.spectrumData.reduce(0, +) / Float(max(audioPlayer.spectrumData.count, 1))
-        
+
         for i in 0..<80 {
             let seed = Double(i) * 17.3
             let angle = time * 0.3 + seed
             let radius = sin(time * 0.5 + seed) * 250 + 150
             let x = centerX + cos(angle) * radius
             let y = centerY + sin(angle) * radius
-            
+
             let size = (sin(time * 2 + seed) + 1) * 2 + 1
             let hue = (seed / 50.0 + time * 0.05).truncatingRemainder(dividingBy: 1.0)
             let brightness = Double(avgLevel) * 0.8 + 0.3
             let color = Color(hue: hue, saturation: 0.8, brightness: brightness)
-            
+
             let rect = CGRect(x: x - size/2, y: y - size/2, width: size, height: size)
             context.fill(Path(ellipseIn: rect), with: .color(color.opacity(0.6)))
         }
     }
-    
+
     private func drawTrackTitle(context: inout GraphicsContext, size: CGSize, time: Double) {
         guard !trackTitle.isEmpty else { return }
-        
+
         // Calculate time since track changed
         let timeSinceChange = Date().timeIntervalSince(trackChangeTime)
-        
+
         // Fade out over 5 seconds
         let fadeOutDuration = 5.0
         let opacity = max(0, 1.0 - (timeSinceChange / fadeOutDuration))
-        
+
         guard opacity > 0 else { return }
-        
+
         // Rotate the text
         let rotation = time * 0.2
-        
+
         // Create the text
         let centerX = size.width / 2
         let centerY = size.height / 2
-        
+
         // Create resolved text
         let hue = (time * 0.1).truncatingRemainder(dividingBy: 1.0)
         let textColor = Color(hue: hue, saturation: 1.0, brightness: 1.0)
-        
+
         let text = Text(trackTitle)
             .font(.system(size: 36, weight: .bold, design: .rounded))
             .foregroundColor(textColor)
-        
+
         // Resolve text for drawing
         let resolved = context.resolve(text)
-        
+
         // Save the context state
         var textContext = context
-        
+
         // Apply rotation around center
         textContext.translateBy(x: centerX, y: centerY)
         textContext.rotate(by: .radians(rotation))
         textContext.translateBy(x: -centerX, y: -centerY)
-        
+
         // Draw glow layers
         for i in 0..<3 {
             let glowOpacity = opacity * (0.3 - Double(i) * 0.1)
             let glowOffset = CGFloat((3 - i)) * 3
-            
+
             var glowContext = textContext
             glowContext.opacity = glowOpacity
             glowContext.addFilter(.blur(radius: 8))
-            
+
             glowContext.draw(
                 resolved,
                 at: CGPoint(x: centerX, y: centerY),
                 anchor: .center
             )
         }
-        
+
         // Draw main text
         textContext.opacity = opacity
         textContext.draw(resolved, at: CGPoint(x: centerX, y: centerY), anchor: .center)
     }
-    
+
     private func drawLyrics(context: inout GraphicsContext, size: CGSize, time: Double) {
         guard let lyricText = audioPlayer.currentLyricText, !lyricText.isEmpty else { return }
-        
+
         // Position lyrics in lower third of screen
         let yPosition = size.height * 0.75
-        
+
         // Create the text with a nice style
         let hue = (time * 0.05).truncatingRemainder(dividingBy: 1.0)
         let textColor = Color(hue: hue, saturation: 0.8, brightness: 1.0)
-        
+
         let text = Text(lyricText)
             .font(.system(size: 32, weight: .semibold, design: .rounded))
             .foregroundColor(textColor)
-        
+
         let resolved = context.resolve(text)
-        
+
         // Draw shadow/glow for better readability
         for i in 0..<4 {
             var glowContext = context
@@ -2224,356 +2224,356 @@ struct MilkdropCanvas: View {
             let offset = Double(i + 1) * 2.0
             glowContext.draw(resolved, at: CGPoint(x: size.width / 2 + offset, y: yPosition + offset), anchor: .center)
         }
-        
+
         // Draw main text
         context.draw(resolved, at: CGPoint(x: size.width / 2, y: yPosition), anchor: .center)
     }
-    
+
     private func drawPresetChange(context: inout GraphicsContext, size: CGSize, time: Double) {
         let timeSinceChange = Date().timeIntervalSince(presetChangeTime)
         let fadeOutDuration = 2.0
         let opacity = max(0, 1.0 - (timeSinceChange / fadeOutDuration))
-        
+
         guard opacity > 0 else { return }
-        
+
         let text = Text(preset.name)
             .font(.system(size: 24, weight: .bold))
             .foregroundColor(.white)
-        
+
         let resolved = context.resolve(text)
-        
+
         var textContext = context
         textContext.opacity = opacity
         textContext.draw(resolved, at: CGPoint(x: size.width / 2, y: 40), anchor: .center)
     }
-    
+
     // MARK: - Oscillator Grid Visualization
     private func drawOscillatorGrid(context: inout GraphicsContext, size: CGSize, time: Double) {
         let rows = 12
         let cols = 16
         let cellWidth = size.width / CGFloat(cols)
         let cellHeight = size.height / CGFloat(rows)
-        
+
         for row in 0..<rows {
             for col in 0..<cols {
                 let x = CGFloat(col) * cellWidth + cellWidth / 2
                 let y = CGFloat(row) * cellHeight + cellHeight / 2
-                
+
                 let spectrumIndex = (col * audioPlayer.spectrumData.count) / cols
                 let level = spectrumIndex < audioPlayer.spectrumData.count ? audioPlayer.spectrumData[spectrumIndex] : 0
-                
+
                 let phase = time + Double(row) * 0.5 + Double(col) * 0.3
                 let wave = sin(phase * 3) * CGFloat(level) * 0.5 + 0.5
-                
+
                 let hue = (Double(col) / Double(cols) + time * 0.05).truncatingRemainder(dividingBy: 1.0)
                 let color = Color(hue: hue, saturation: 0.9, brightness: Double(wave))
-                
+
                 let radius = cellWidth * 0.3 * wave
                 let rect = CGRect(x: x - radius, y: y - radius, width: radius * 2, height: radius * 2)
                 context.fill(Path(ellipseIn: rect), with: .color(color.opacity(0.8)))
             }
         }
     }
-    
+
     // MARK: - Plasma Field Visualization
     private func drawPlasmaField(context: inout GraphicsContext, size: CGSize, time: Double) {
         let avgLevel = audioPlayer.spectrumData.reduce(0, +) / Float(max(audioPlayer.spectrumData.count, 1))
         let speed = time * (0.5 + Double(avgLevel))
-        
+
         for y in stride(from: 0, to: size.height, by: 8) {
             for x in stride(from: 0, to: size.width, by: 8) {
                 let nx = x / size.width
                 let ny = y / size.height
-                
+
                 let plasma = sin(nx * 10 + speed)
                     + sin(ny * 10 + speed)
                     + sin((nx + ny) * 10 + speed)
                     + sin(sqrt(nx * nx + ny * ny) * 10 + speed)
-                
+
                 let normalized = (plasma + 4) / 8
                 let hue = normalized
                 let brightness = 0.5 + Double(avgLevel) * 0.5
-                
+
                 let color = Color(hue: hue, saturation: 1.0, brightness: brightness)
                 let rect = CGRect(x: x, y: y, width: 8, height: 8)
                 context.fill(Path(rect), with: .color(color))
             }
         }
     }
-    
+
     // MARK: - Particle Storm Visualization
     private func drawParticleStorm(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double) {
         for i in 0..<200 {
             let seed = Double(i) * 23.7
             let spectrumIndex = i % audioPlayer.spectrumData.count
             let level = audioPlayer.spectrumData[spectrumIndex]
-            
+
             let angle = time * 2 + seed
             let speed = 1.0 + Double(level) * 3
             let distance = ((time * speed + seed).truncatingRemainder(dividingBy: 500))
-            
+
             let x = centerX + cos(angle) * distance
             let y = centerY + sin(angle) * distance
-            
+
             let size = CGFloat(level) * 8 + 2
             let hue = (seed / 100 + time * 0.2).truncatingRemainder(dividingBy: 1.0)
             let color = Color(hue: hue, saturation: 1.0, brightness: Double(level) * 0.7 + 0.3)
-            
+
             let rect = CGRect(x: x - size/2, y: y - size/2, width: size, height: size)
             context.fill(Path(ellipseIn: rect), with: .color(color.opacity(0.7)))
         }
     }
-    
+
     // MARK: - Frequency Rings Visualization
     private func drawFrequencyRings(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, time: Double) {
         for (index, level) in audioPlayer.spectrumData.enumerated() {
             let radius = CGFloat(index) * 15 + 50 + CGFloat(level) * 80
             let thickness: CGFloat = 4 + CGFloat(level) * 10
-            
+
             let hue = Double(index) / Double(audioPlayer.spectrumData.count)
             let color = Color(hue: hue, saturation: 1.0, brightness: Double(level) * 0.8 + 0.2)
-            
+
             var path = Path()
             path.addEllipse(in: CGRect(x: centerX - radius, y: centerY - radius, width: radius * 2, height: radius * 2))
-            
+
             context.stroke(path, with: .color(color.opacity(0.6)), lineWidth: thickness)
         }
     }
-    
+
     // MARK: - Waveform Tunnel Visualization
     private func drawWaveformTunnel(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double) {
         for ring in 0..<30 {
             let depth = CGFloat(ring) / 30.0
             let radius = (1.0 - depth) * min(size.width, size.height) * 0.4 + 50
-            
+
             var path = Path()
             let segments = 60
-            
+
             for i in 0...segments {
                 let angle = (Double(i) / Double(segments)) * .pi * 2
                 let spectrumIndex = (i * audioPlayer.spectrumData.count) / segments
                 let level = spectrumIndex < audioPlayer.spectrumData.count ? audioPlayer.spectrumData[spectrumIndex] : 0
-                
+
                 let wave = CGFloat(level) * 50 * (1.0 - depth)
                 let r = radius + wave
-                
+
                 let x = centerX + cos(angle + time + Double(ring) * 0.2) * r
                 let y = centerY + sin(angle + time + Double(ring) * 0.2) * r
-                
+
                 if i == 0 {
                     path.move(to: CGPoint(x: x, y: y))
                 } else {
                     path.addLine(to: CGPoint(x: x, y: y))
                 }
             }
-            
+
             let hue = (Double(ring) / 30.0 + time * 0.1).truncatingRemainder(dividingBy: 1.0)
             let color = Color(hue: hue, saturation: 0.9, brightness: 1.0 - depth * 0.5)
-            
+
             context.stroke(path, with: .color(color.opacity(0.5)), lineWidth: 2)
         }
     }
-    
+
     // MARK: - Kaleidoscope Visualization
     private func drawKaleidoscope(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double) {
         let segments = 12
         let angleStep = .pi * 2 / Double(segments)
-        
+
         for segment in 0..<segments {
             let baseAngle = Double(segment) * angleStep
-            
+
             var segmentContext = context
             segmentContext.translateBy(x: centerX, y: centerY)
             segmentContext.rotate(by: .radians(baseAngle))
             segmentContext.translateBy(x: -centerX, y: -centerY)
-            
+
             for i in 0..<50 {
                 let t = Double(i) / 50.0
                 let spectrumIndex = (i * audioPlayer.spectrumData.count) / 50
                 let level = spectrumIndex < audioPlayer.spectrumData.count ? audioPlayer.spectrumData[spectrumIndex] : 0
-                
+
                 let r = t * 300
                 let angle = t * .pi * 4 + time
                 let x = centerX + cos(angle) * r
                 let y = centerY + sin(angle) * r * CGFloat(level + 0.3)
-                
+
                 let hue = (t + time * 0.1).truncatingRemainder(dividingBy: 1.0)
                 let color = Color(hue: hue, saturation: 1.0, brightness: Double(level) * 0.7 + 0.3)
-                
+
                 let size = CGFloat(level) * 20 + 5
                 let rect = CGRect(x: x - size/2, y: y - size/2, width: size, height: size)
                 segmentContext.fill(Path(ellipseIn: rect), with: .color(color.opacity(0.6)))
             }
         }
     }
-    
+
     // MARK: - LFO Morph Visualization
     private func drawLFOMorph(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double) {
         let avgLevel = audioPlayer.spectrumData.reduce(0, +) / Float(max(audioPlayer.spectrumData.count, 1))
-        
+
         // LFO modulators
         let lfo1 = sin(time * 0.5) * 0.5 + 0.5
         let lfo2 = sin(time * 0.7) * 0.5 + 0.5
         let lfo3 = sin(time * 1.1) * 0.5 + 0.5
-        
+
         for layer in 0..<5 {
             let layerDepth = Double(layer) / 5.0
             let radius = 100 + layerDepth * 200
-            
+
             var path = Path()
             let segments = 120
-            
+
             for i in 0...segments {
                 let angle = (Double(i) / Double(segments)) * .pi * 2
                 let spectrumIndex = (i * audioPlayer.spectrumData.count) / segments
                 let level = spectrumIndex < audioPlayer.spectrumData.count ? audioPlayer.spectrumData[spectrumIndex] : 0
-                
+
                 let morph1 = sin(angle * 3 + time * lfo1) * lfo2 * 50
                 let morph2 = cos(angle * 5 + time * lfo3) * lfo1 * 30
                 let audioMod = Double(level) * 80
-                
+
                 let r = radius + morph1 + morph2 + audioMod
                 let x = centerX + cos(angle) * r
                 let y = centerY + sin(angle) * r
-                
+
                 if i == 0 {
                     path.move(to: CGPoint(x: x, y: y))
                 } else {
                     path.addLine(to: CGPoint(x: x, y: y))
                 }
             }
-            
+
             let hue = (layerDepth + time * 0.1 + Double(avgLevel) * 0.5).truncatingRemainder(dividingBy: 1.0)
             let color = Color(hue: hue, saturation: 0.9, brightness: 0.8)
-            
+
             context.stroke(path, with: .color(color.opacity(0.6)), lineWidth: 3)
         }
     }
-    
+
     // MARK: - Nebula Galaxy Visualization
     private func drawNebulaGalaxy(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double) {
         let avgLevel = audioPlayer.spectrumData.reduce(0, +) / Float(max(audioPlayer.spectrumData.count, 1))
-        
+
         // Draw background star field
         drawStarField(context: &context, size: size, time: time)
-        
+
         // Draw nebula clouds
         drawNebulaClouds(context: &context, centerX: centerX, centerY: centerY, size: size, time: time, intensity: Double(avgLevel))
-        
+
         // Draw galaxy core
         drawGalaxyCore(context: &context, centerX: centerX, centerY: centerY, time: time, intensity: Double(avgLevel))
-        
+
         // Draw spiral arms with stars
         drawGalaxySpiralArms(context: &context, centerX: centerX, centerY: centerY, size: size, time: time)
-        
+
         // Draw dust lanes
         drawDustLanes(context: &context, centerX: centerX, centerY: centerY, size: size, time: time)
     }
-    
+
     private func drawStarField(context: inout GraphicsContext, size: CGSize, time: Double) {
         // Background stars
         for i in 0..<300 {
             let seed = Double(i) * 57.3
             let x = (sin(seed) * 0.5 + 0.5) * size.width
             let y = (cos(seed * 1.3) * 0.5 + 0.5) * size.height
-            
+
             let twinkle = (sin(time * 2 + seed) + 1) * 0.5
             let brightness = 0.3 + twinkle * 0.4
             let starSize = (sin(seed * 2.7) + 1) * 0.5 + 0.5
-            
+
             let color = Color.white.opacity(brightness)
             let rect = CGRect(x: x - starSize, y: y - starSize, width: starSize * 2, height: starSize * 2)
             context.fill(Path(ellipseIn: rect), with: .color(color))
         }
     }
-    
+
     private func drawNebulaClouds(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double, intensity: Double) {
         // Create flowing nebula clouds
         for layer in 0..<3 {
             let layerOffset = Double(layer) * 0.3
-            
+
             for i in 0..<80 {
                 let angle = Double(i) / 80.0 * .pi * 2 + time * 0.1 * Double(layer + 1)
                 let distance = 100 + Double(i) * 6 + sin(time * 0.5 + Double(i) * 0.3) * 40
                 let x = centerX + cos(angle) * distance
                 let y = centerY + sin(angle) * distance * 0.7  // Flatten for galaxy shape
-                
+
                 let spectrumIndex = i % audioPlayer.spectrumData.count
                 let level = audioPlayer.spectrumData[spectrumIndex]
-                
+
                 let cloudSize = 15 + CGFloat(level) * 30 + CGFloat(layer) * 10
-                
+
                 // Nebula colors - pink, purple, blue
                 let hue = 0.7 + layerOffset * 0.15 + sin(time * 0.2 + Double(i) * 0.1) * 0.1
                 let saturation = 0.7 + Double(level) * 0.3
                 let brightness = 0.3 + Double(level) * 0.5 + intensity * 0.3
-                
+
                 let color = Color(hue: hue, saturation: saturation, brightness: brightness)
-                
+
                 var cloudContext = context
                 cloudContext.addFilter(.blur(radius: 15))
-                
+
                 let rect = CGRect(x: x - cloudSize/2, y: y - cloudSize/2, width: cloudSize, height: cloudSize)
                 cloudContext.fill(Path(ellipseIn: rect), with: .color(color.opacity(0.4)))
             }
         }
     }
-    
+
     private func drawGalaxyCore(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, time: Double, intensity: Double) {
         // Bright galactic core
         let coreSize: CGFloat = 60 + CGFloat(intensity) * 40
-        
+
         // Outer glow layers
         for i in 0..<5 {
             let scale = CGFloat(5 - i) / 5.0
             let size = coreSize * scale * 1.5
             let brightness = 0.2 + scale * 0.6 + intensity * 0.2
-            
+
             var glowContext = context
             glowContext.addFilter(.blur(radius: 20))
-            
+
             let color = Color(hue: 0.05, saturation: 0.9, brightness: brightness)
             let rect = CGRect(x: centerX - size/2, y: centerY - size/2, width: size, height: size)
             glowContext.fill(Path(ellipseIn: rect), with: .color(color.opacity(0.6)))
         }
-        
+
         // Bright center
         let centerColor = Color(hue: 0.1, saturation: 0.7, brightness: 1.0)
         let centerRect = CGRect(x: centerX - coreSize/4, y: centerY - coreSize/4, width: coreSize/2, height: coreSize/2)
         context.fill(Path(ellipseIn: centerRect), with: .color(centerColor.opacity(0.9)))
     }
-    
+
     private func drawGalaxySpiralArms(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double) {
         // Multiple spiral arms with individual stars
         let numArms = 4
         let rotation = time * 0.15
-        
+
         for arm in 0..<numArms {
             let armAngleOffset = Double(arm) * (.pi * 2 / Double(numArms))
-            
+
             for i in 0..<150 {
                 let t = Double(i) / 150.0
                 let spiralAngle = t * .pi * 4 + rotation + armAngleOffset
                 let spiralDistance = t * min(size.width, size.height) * 0.45
-                
+
                 let spectrumIndex = (i * audioPlayer.spectrumData.count) / 150
                 let level = spectrumIndex < audioPlayer.spectrumData.count ? audioPlayer.spectrumData[spectrumIndex] : 0
-                
+
                 // Add some randomness to star positions
                 let noise = sin(Double(i) * 13.7 + Double(arm) * 7.3) * 10
-                
+
                 let x = centerX + cos(spiralAngle) * (spiralDistance + noise)
                 let y = centerY + sin(spiralAngle) * (spiralDistance + noise) * 0.7
-                
+
                 let starSize = (1.0 - t * 0.5) * 3 + CGFloat(level) * 4
                 let brightness = (1.0 - t * 0.3) + Double(level) * 0.5
-                
+
                 // Stars in arms - blue-white
                 let color = Color(hue: 0.55 + t * 0.1, saturation: 0.4, brightness: brightness)
-                
+
                 let rect = CGRect(x: x - starSize/2, y: y - starSize/2, width: starSize, height: starSize)
                 context.fill(Path(ellipseIn: rect), with: .color(color.opacity(0.8)))
-                
+
                 // Add occasional bright stars
                 if i % 10 == 0 {
                     var glowContext = context
@@ -2584,27 +2584,27 @@ struct MilkdropCanvas: View {
             }
         }
     }
-    
+
     private func drawDustLanes(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double) {
         // Dark dust lanes between spiral arms
         let rotation = time * 0.15
-        
+
         for lane in 0..<4 {
             let laneAngle = Double(lane) * (.pi * 2 / 4.0) + rotation + .pi / 4
-            
+
             var path = Path()
             var isFirst = true
-            
+
             for i in 0..<100 {
                 let t = Double(i) / 100.0
                 let angle = laneAngle + t * .pi * 4
                 let distance = t * min(size.width, size.height) * 0.4 + 50
-                
+
                 let wave = sin(t * .pi * 8 + time) * 15
-                
+
                 let x = centerX + cos(angle) * (distance + wave)
                 let y = centerY + sin(angle) * (distance + wave) * 0.7
-                
+
                 if isFirst {
                     path.move(to: CGPoint(x: x, y: y))
                     isFirst = false
@@ -2612,103 +2612,103 @@ struct MilkdropCanvas: View {
                     path.addLine(to: CGPoint(x: x, y: y))
                 }
             }
-            
+
             var dustContext = context
             dustContext.addFilter(.blur(radius: 8))
-            
+
             let dustColor = Color(red: 0.1, green: 0.05, blue: 0.05)
             dustContext.stroke(path, with: .color(dustColor.opacity(0.6)), lineWidth: 20)
         }
     }
-    
+
     // MARK: - Starfield Flight Visualization
     private func drawStarfieldFlight(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double) {
         let avgLevel = audioPlayer.spectrumData.reduce(0, +) / Float(max(audioPlayer.spectrumData.count, 1))
-        
+
         // Calculate rotation angle based on frequency bands
         // Low frequencies (bass) rotate left, high frequencies rotate right
         let spectrumCount = audioPlayer.spectrumData.count
         let lowEnd = spectrumCount / 3
         let highStart = (spectrumCount * 2) / 3
-        
+
         let lowFreqs = audioPlayer.spectrumData.prefix(lowEnd)
         let highFreqs = audioPlayer.spectrumData.suffix(spectrumCount - highStart)
-        
+
         let lowAvg = lowFreqs.reduce(0, +) / Float(max(lowFreqs.count, 1))
         let highAvg = highFreqs.reduce(0, +) / Float(max(highFreqs.count, 1))
-        
+
         // Rotation based on amplitude difference between low and high frequencies
         let rotationAngle = (Double(lowAvg) - Double(highAvg)) * 1.5
-        
+
         // Speed based on overall amplitude - stars come at you faster with louder music
         let baseSpeed = 3.0 + Double(avgLevel) * 6.0
-        
+
         // Draw massive stream of stars flying directly towards you
         for i in 0..<1500 {
             let seed = Double(i) * 37.3
-            
+
             // Random position in 3D space - fill entire view cone
             let angle = seed * 2.5
             let radius = (sin(seed * 3.7) + 1) * 600 + 50
             let initX = cos(angle) * radius
             let initY = sin(angle) * radius
-            
+
             // Z position - stars distributed throughout depth
             let initZ = ((seed * 80).truncatingRemainder(dividingBy: 3000)) + 50
-            
+
             // Z position moves forward - stars coming AT you
             let zProgress = (time * baseSpeed * 250).truncatingRemainder(dividingBy: 3000)
             let z = ((initZ - zProgress + 3000).truncatingRemainder(dividingBy: 3000)) + 10
-            
+
             // Skip if star is too close or behind
             guard z > 5 else { continue }
-            
+
             // Apply rotation to the entire starfield
             let rotatedX = initX * cos(rotationAngle) - initY * sin(rotationAngle)
             let rotatedY = initX * sin(rotationAngle) + initY * cos(rotationAngle)
-            
+
             // Perspective projection - stars expand as they approach
             let perspective = 1000.0 / z
             let screenX = centerX + rotatedX * perspective
             let screenY = centerY + rotatedY * perspective
-            
+
             // Skip if off screen (with padding for trails)
-            guard screenX > -100 && screenX < size.width + 100 && 
+            guard screenX > -100 && screenX < size.width + 100 &&
                   screenY > -100 && screenY < size.height + 100 else { continue }
-            
+
             // Star size increases dramatically as it approaches
             let starSize = CGFloat(perspective * 3)
             let brightness = min(1.0, perspective * 0.7)
-            
+
             // Motion blur - trail points toward center (coming at you)
             let directionX = screenX - centerX
             let directionY = screenY - centerY
             let distance = sqrt(directionX * directionX + directionY * directionY)
-            
+
             let trailLength = starSize * 4 * CGFloat(baseSpeed) / 5
             let trailEndX = screenX - (directionX / distance) * trailLength
             let trailEndY = screenY - (directionY / distance) * trailLength
-            
+
             // Star color - spectrum-reactive
             let spectrumIndex = i % audioPlayer.spectrumData.count
             let level = audioPlayer.spectrumData[spectrumIndex]
-            
+
             let hue = 0.55 + Double(level) * 0.35
             let saturation = 0.15 + Double(level) * 0.6
             let starColor = Color(hue: hue, saturation: saturation, brightness: brightness)
-            
+
             // Draw motion trail - thicker for closer stars
             var path = Path()
             path.move(to: CGPoint(x: trailEndX, y: trailEndY))
             path.addLine(to: CGPoint(x: screenX, y: screenY))
-            
+
             let trailWidth = max(1.5, starSize * 0.7)
             context.stroke(path, with: .color(starColor.opacity(0.7)), lineWidth: trailWidth)
-            
+
             // Draw star point
             let rect = CGRect(x: screenX - starSize/2, y: screenY - starSize/2, width: starSize, height: starSize)
             context.fill(Path(ellipseIn: rect), with: .color(starColor.opacity(0.9)))
-            
+
             // Bright glow for closer stars
             if perspective > 2.0 {
                 var glowContext = context
@@ -2718,65 +2718,65 @@ struct MilkdropCanvas: View {
                 glowContext.fill(Path(ellipseIn: glowRect), with: .color(starColor.opacity(0.5)))
             }
         }
-        
+
         // Add extra dense star field in the distance
         for i in 0..<800 {
             let seed = Double(i) * 91.7 + 5000
-            
+
             let angle = seed * 3.1
             let radius = (sin(seed * 2.3) + 1) * 400 + 100
             let initX = cos(angle) * radius
             let initY = sin(angle) * radius
-            
+
             let initZ = 2000 + ((seed * 50).truncatingRemainder(dividingBy: 1000))
             let zProgress = (time * baseSpeed * 150).truncatingRemainder(dividingBy: 1000)
             let z = ((initZ - zProgress + 1000).truncatingRemainder(dividingBy: 1000)) + 2000
-            
+
             let rotatedX = initX * cos(rotationAngle * 0.5) - initY * sin(rotationAngle * 0.5)
             let rotatedY = initX * sin(rotationAngle * 0.5) + initY * cos(rotationAngle * 0.5)
-            
+
             let perspective = 1000.0 / z
             let screenX = centerX + rotatedX * perspective
             let screenY = centerY + rotatedY * perspective
-            
-            guard screenX > 0 && screenX < size.width && 
+
+            guard screenX > 0 && screenX < size.width &&
                   screenY > 0 && screenY < size.height else { continue }
-            
+
             let starSize = CGFloat(perspective * 2)
             let brightness = min(0.6, perspective * 0.4)
-            
+
             let color = Color.white.opacity(brightness)
             let rect = CGRect(x: screenX - starSize/2, y: screenY - starSize/2, width: starSize, height: starSize)
             context.fill(Path(ellipseIn: rect), with: .color(color))
         }
-        
+
         // Add nebula clouds in the distance
         drawSpaceNebula(context: &context, centerX: centerX, centerY: centerY, size: size, time: time, rotation: rotationAngle)
     }
-    
+
     private func drawSpaceNebula(context: inout GraphicsContext, centerX: CGFloat, centerY: CGFloat, size: CGSize, time: Double, rotation: Double) {
         // Distant colorful nebula clouds that drift slowly
         for i in 0..<5 {
             let seed = Double(i) * 127.3
             let angle = seed + time * 0.05
             let distance = 150 + sin(time * 0.1 + seed) * 50
-            
+
             let x = centerX + cos(angle + rotation * 0.2) * distance
             let y = centerY + sin(angle + rotation * 0.2) * distance * 0.6
-            
+
             let cloudSize: CGFloat = 80 + CGFloat(i) * 20
             let hue = (seed / 500.0 + time * 0.02).truncatingRemainder(dividingBy: 1.0)
             let color = Color(hue: hue, saturation: 0.7, brightness: 0.4)
-            
+
             var cloudContext = context
             cloudContext.addFilter(.blur(radius: 30))
             cloudContext.opacity = 0.3
-            
+
             let rect = CGRect(x: x - cloudSize/2, y: y - cloudSize/2, width: cloudSize, height: cloudSize)
             cloudContext.fill(Path(ellipseIn: rect), with: .color(color))
         }
     }
-    
+
     private func drawStarWarsCrawl(context: inout GraphicsContext, size: CGSize, time: Double) {
         // Deep space background
         let bgGradient = Gradient(colors: [
@@ -2787,46 +2787,46 @@ struct MilkdropCanvas: View {
             Path(CGRect(origin: .zero, size: size)),
             with: .linearGradient(bgGradient, startPoint: .zero, endPoint: CGPoint(x: 0, y: size.height))
         )
-        
+
         // Draw moving starfield - stars coming toward viewer
         let centerX = size.width / 2
         let centerY = size.height * 0.3
-        
+
         for i in 0..<300 {
             let seed = Double(i) * 73.5
-            
+
             // Stars positioned in 3D space
             let angle = seed * 2.5
             let radius = (sin(seed * 3.1) + 1) * 400 + 50
             let initX = cos(angle) * radius
             let initY = sin(angle) * radius
-            
+
             // Z position - depth into space
             let initZ = ((seed * 60).truncatingRemainder(dividingBy: 2000)) + 100
             let zProgress = (time * 200).truncatingRemainder(dividingBy: 2000)
             let z = ((initZ - zProgress + 2000).truncatingRemainder(dividingBy: 2000)) + 100
-            
+
             guard z > 10 else { continue }
-            
+
             // Perspective projection
             let perspective = 800.0 / z
             let screenX = centerX + initX * perspective
             let screenY = centerY + initY * perspective
-            
+
             // Skip if off screen
-            guard screenX > -20 && screenX < size.width + 20 && 
+            guard screenX > -20 && screenX < size.width + 20 &&
                   screenY > -20 && screenY < size.height + 20 else { continue }
-            
+
             let starSize = CGFloat(perspective * 2)
             let brightness = min(1.0, perspective * 0.8)
-            
+
             let rect = CGRect(x: screenX - starSize/2, y: screenY - starSize/2, width: starSize, height: starSize)
             context.fill(Path(ellipseIn: rect), with: .color(Color.white.opacity(brightness)))
         }
-        
+
         // Draw grid lines on the plane for depth effect
         drawPerspectiveGrid(context: &context, size: size, time: time)
-        
+
         // Get lyrics lines
         let allLyrics = audioPlayer.currentLyrics
         guard !allLyrics.isEmpty else {
@@ -2837,11 +2837,11 @@ struct MilkdropCanvas: View {
             ], scrollOffset: time * 30)
             return
         }
-        
+
         // Find current lyric and surrounding context
         let currentTime = audioPlayer.currentTime
         var displayLines: [String] = []
-        
+
         // Get current and upcoming lyrics
         var currentIndex = 0
         for (index, lyric) in allLyrics.enumerated() {
@@ -2849,125 +2849,125 @@ struct MilkdropCanvas: View {
                 currentIndex = index
             }
         }
-        
+
         let startIndex = max(0, currentIndex - 2)
         let endIndex = min(allLyrics.count - 1, currentIndex + 8)
-        
+
         for i in startIndex...endIndex {
             displayLines.append(allLyrics[i].text)
             if i < endIndex {
                 displayLines.append("") // Add spacing between lines
             }
         }
-        
+
         // Calculate scroll offset - auto-scroll with music time
         let baseScroll = time * 50
         let scrollOffset = baseScroll.truncatingRemainder(dividingBy: Double(displayLines.count * 80 + 500))
-        
+
         drawCrawlText(context: &context, size: size, lines: displayLines, scrollOffset: scrollOffset)
     }
-    
+
     private func drawPerspectiveGrid(context: inout GraphicsContext, size: CGSize, time: Double) {
         let centerX = size.width / 2
         let vanishingY = size.height * 0.3
-        
+
         // Draw horizontal grid lines receding into distance
         for i in 0..<12 {
             let z = Double(i) * 150 + ((time * 100).truncatingRemainder(dividingBy: 150))
             let perspective = 1000.0 / (z + 100)
             let y = vanishingY + (size.height - vanishingY) * CGFloat(perspective)
-            
+
             guard y > vanishingY && y < size.height else { continue }
-            
+
             let lineWidth = perspective * 150
             let opacity = min(0.2, perspective * 0.3)
-            
+
             var path = Path()
             path.move(to: CGPoint(x: centerX - lineWidth, y: y))
             path.addLine(to: CGPoint(x: centerX + lineWidth, y: y))
-            
+
             context.stroke(path, with: .color(Color.cyan.opacity(opacity)), lineWidth: 1)
         }
-        
+
         // Draw vertical grid lines converging to center
         for i in -4...4 {
             guard i != 0 else { continue }
             let xOffset = Double(i) * 60
-            
+
             var path = Path()
             path.move(to: CGPoint(x: centerX + xOffset, y: size.height))
             path.addLine(to: CGPoint(x: centerX, y: vanishingY))
-            
+
             context.stroke(path, with: .color(Color.cyan.opacity(0.15)), lineWidth: 1)
         }
     }
-    
+
     private func drawCrawlText(context: inout GraphicsContext, size: CGSize, lines: [String], scrollOffset: Double) {
         // Text on flat plane receding into distance
         let centerX = size.width / 2
         let vanishingY = size.height * 0.25 // Vanishing point on horizon
         let planeStartY = size.height // Bottom of screen (closest point)
-        
+
         // Calculate the Z position offset based on scroll
         let zOffset = scrollOffset * 2
-        
+
         for (index, line) in lines.enumerated() {
             // Each line has a Z position (depth into the scene)
             let lineZ = Double(index) * 150 + 200 - zOffset
-            
+
             // Skip if too far (past vanishing point)
             guard lineZ > 10 else { continue }
-            
+
             // Skip if too close (behind viewer)
             guard lineZ < 3000 else { continue }
-            
+
             // Calculate perspective
             let perspective = 1000.0 / lineZ
-            
+
             // Y position on screen based on perspective (farther = higher on screen toward vanishing point)
             let yPosition = vanishingY + (planeStartY - vanishingY) * CGFloat(perspective)
-            
+
             // Skip if off screen
             guard yPosition > vanishingY - 20 && yPosition < size.height + 50 else { continue }
-            
+
             // Text size based on distance - larger range for more dramatic effect
             let fontSize = 10 + perspective * 50
-            
+
             // Width scale (text gets narrower as it recedes)
             let widthScale = perspective
-            
+
             // Height scale (gets flatter/compressed as it recedes - flat plane effect)
             // More compression for stronger Star Wars effect
             let heightScale = 0.2 + perspective * 0.6
-            
+
             // Opacity - fade out in distance
             let opacity = min(1.0, perspective * 1.5)
-            
+
             // Create text with italic style for Star Wars look
             let text = Text(line)
                 .font(.system(size: fontSize, weight: .bold, design: .rounded))
                 .italic()
                 .foregroundColor(.yellow)
-            
+
             let resolved = context.resolve(text)
-            
+
             // Apply transformations for flat plane perspective with italic skew
             var textContext = context
             textContext.opacity = opacity
-            
+
             // Move to position
             textContext.translateBy(x: centerX, y: yPosition)
-            
+
             // Apply perspective scaling
             textContext.scaleBy(x: widthScale, y: heightScale)
-            
+
             // Apply skew/shear for additional italic effect (Star Wars trademark look)
             // This makes the text lean back into the distance
             let skewAmount = -0.2 + (1.0 - perspective) * 0.15
             textContext.concatenate(CGAffineTransform(a: 1, b: 0, c: skewAmount, d: 1, tx: 0, ty: 0))
-            
+
             textContext.translateBy(x: -centerX, y: -yPosition)
-            
+
             // Draw glow
             for i in 0..<3 {
                 var glowContext = textContext
@@ -2975,7 +2975,7 @@ struct MilkdropCanvas: View {
                 let glowOffset = Double(i + 1) * 2.0
                 glowContext.draw(resolved, at: CGPoint(x: centerX, y: yPosition + glowOffset), anchor: .center)
             }
-            
+
             // Draw main text
             textContext.draw(resolved, at: CGPoint(x: centerX, y: yPosition), anchor: .center)
         }
@@ -2996,7 +2996,7 @@ struct AnimatedSongDisplay: View {
     let title: String
     let trackId: UUID?
     @Binding var displayMode: DisplayMode
-    
+
     @State private var scrollOffset: CGFloat = 0
     @State private var vestaboardPhase: Int = 0 // 0 = revealing artist, 1 = showing/scrolling artist, 2 = revealing title, 3 = showing/scrolling title
     @State private var revealedChars: Int = 0
@@ -3009,7 +3009,7 @@ struct AnimatedSongDisplay: View {
     @State private var pixelatedPhase: Int = 0 // 0 = artist, 1 = title
     @State private var pixelatedProgress: Double = 0 // 0 to 2 (0-1 = fade in, 1-2 = fade out)
     @State private var charRandomOffsets: [Double] = []
-    
+
     var body: some View {
         GeometryReader { geometry in
             Group {
@@ -3047,28 +3047,28 @@ struct AnimatedSongDisplay: View {
             resetAnimation()
         }
     }
-    
+
     private func scrollingDisplay(width: CGFloat) -> some View {
         let fullText = "\(artist) • \(title)"
-        
+
         return TimelineView(.animation(minimumInterval: 0.03)) { _ in
             Canvas { context, size in
                 let text = Text(fullText)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(MacAmpColors.displayText)
-                
+
                 let resolved = context.resolve(text)
                 let textWidth = resolved.measure(in: size).width
-                
+
                 // Check if text needs to scroll
                 if textWidth > width - 12 {
                     // Scrolling text
                     let scrollDistance = textWidth + 200 // Add gap between loops
-                    
+
                     // Draw text twice for seamless loop
                     context.draw(resolved, at: CGPoint(x: 6 + scrollOffset, y: size.height / 2), anchor: .leading)
                     context.draw(resolved, at: CGPoint(x: 6 + scrollOffset + scrollDistance, y: size.height / 2), anchor: .leading)
-                    
+
                     // Update scroll offset
                     DispatchQueue.main.async {
                         scrollOffset -= 0.3
@@ -3083,14 +3083,14 @@ struct AnimatedSongDisplay: View {
             }
         }
     }
-    
+
     private func vestaboardDisplay(width: CGFloat) -> some View {
         TimelineView(.animation(minimumInterval: 0.05)) { _ in
             Canvas { context, size in
                 // Determine which text to show based on phase
                 let fullText: String
                 let isRevealing: Bool
-                
+
                 switch vestaboardPhase {
                 case 0: // Revealing artist
                     fullText = artist
@@ -3108,15 +3108,15 @@ struct AnimatedSongDisplay: View {
                     fullText = ""
                     isRevealing = false
                 }
-                
+
                 let text = Text(fullText)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(MacAmpColors.displayText)
-                
+
                 let resolved = context.resolve(text)
                 let textWidth = resolved.measure(in: size).width
                 let availableWidth = width - 12
-                
+
                 if isRevealing {
                     // Draw only revealed characters
                     let displayText = String(fullText.prefix(revealedChars))
@@ -3130,7 +3130,7 @@ struct AnimatedSongDisplay: View {
                     if textWidth > availableWidth {
                         // Scrolling text
                         let scrollDistance = textWidth + 100
-                        
+
                         // Draw text twice for seamless loop
                         context.draw(resolved, at: CGPoint(x: 6 + vestaboardScrollOffset, y: size.height / 2), anchor: .leading)
                         context.draw(resolved, at: CGPoint(x: 6 + vestaboardScrollOffset + scrollDistance, y: size.height / 2), anchor: .leading)
@@ -3139,7 +3139,7 @@ struct AnimatedSongDisplay: View {
                         context.draw(resolved, at: CGPoint(x: 6, y: size.height / 2), anchor: .leading)
                     }
                 }
-                
+
                 // Update animation state
                 DispatchQueue.main.async {
                     updateVestaboardAnimation(fullText: fullText, textWidth: textWidth, availableWidth: availableWidth)
@@ -3147,20 +3147,20 @@ struct AnimatedSongDisplay: View {
             }
         }
     }
-    
+
     private func scrollingUpDisplay(width: CGFloat, height: CGFloat) -> some View {
         TimelineView(.animation(minimumInterval: 0.03)) { _ in
             Canvas { context, size in
                 // Determine which text to show based on phase
                 let currentText = scrollUpPhase == 0 ? artist : title
-                
+
                 let text = Text(currentText)
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(MacAmpColors.displayText)
-                
+
                 let resolved = context.resolve(text)
                 let textHeight = resolved.measure(in: CGSize(width: width - 12, height: .infinity)).height
-                
+
                 // Create a scrolling window effect
                 // Text starts below the visible area and scrolls up
                 let startY = size.height + textHeight
@@ -3168,13 +3168,13 @@ struct AnimatedSongDisplay: View {
                 let totalDistance = startY - endY
                 // Calculate the scroll offset when text is centered
                 let centerOffset = startY - (size.height / 2) + 2
-                
+
                 // Calculate current Y position based on scroll offset
                 let currentY = startY - scrollUpOffset
-                
+
                 // Draw the text at the current position
                 context.draw(resolved, at: CGPoint(x: size.width / 2, y: currentY), anchor: .center)
-                
+
                 // Update animation state
                 DispatchQueue.main.async {
                     updateScrollUpAnimation(totalDistance: totalDistance, centerOffset: centerOffset, viewHeight: size.height)
@@ -3182,35 +3182,35 @@ struct AnimatedSongDisplay: View {
             }
         }
     }
-    
+
     private func updateScrollUpAnimation(totalDistance: CGFloat, centerOffset: CGFloat, viewHeight: CGFloat) {
         // Calculate if text is centered
         // When scrollUpOffset equals centerOffset, the text should be centered
         let distanceFromCenter = abs(scrollUpOffset - centerOffset)
-        
+
         // If we're within a threshold of the center and not already paused, start pause
         // Use a wider threshold range to catch the centering more reliably
         if distanceFromCenter < 5 && !scrollUpPaused && scrollUpOffset > 10 && scrollUpOffset < totalDistance - 10 {
             scrollUpPaused = true
             scrollUpPauseTimer = 0
         }
-        
+
         // If paused, increment timer
         if scrollUpPaused {
             scrollUpPauseTimer += 0.03
-            
+
             // Resume after 2.5 seconds
             if scrollUpPauseTimer >= 2.5 {
                 scrollUpPaused = false
                 scrollUpPauseTimer = 0
             }
         }
-        
+
         // Only scroll if not paused
         if !scrollUpPaused {
             scrollUpOffset += 0.5
         }
-        
+
         // When text has fully scrolled off the top, switch to the other text
         if scrollUpOffset >= totalDistance {
             scrollUpOffset = 0
@@ -3219,13 +3219,13 @@ struct AnimatedSongDisplay: View {
             scrollUpPauseTimer = 0
         }
     }
-    
+
     private func pixelatedDisplay(width: CGFloat) -> some View {
         TimelineView(.animation(minimumInterval: 0.03)) { _ in
             Canvas { context, size in
                 // Determine which text to show based on phase
                 let currentText = pixelatedPhase == 0 ? artist : title
-                
+
                 // Ensure random offsets are initialized synchronously
                 let offsets: [Double]
                 if charRandomOffsets.count == currentText.count {
@@ -3240,13 +3240,13 @@ struct AnimatedSongDisplay: View {
                         }
                     }
                 }
-                
+
                 // Draw each character with individual opacity based on progress and random offset
                 var xPos: CGFloat = 6.0
                 for (index, char) in currentText.enumerated() {
                     let randomOffset = index < offsets.count ? offsets[index] : 0
                     let charProgress = pixelatedProgress + randomOffset
-                    
+
                     // Calculate opacity: fade in from 0 to 1, then fade out from 1 to 0
                     let opacity: Double
                     if charProgress < 1.0 {
@@ -3256,25 +3256,25 @@ struct AnimatedSongDisplay: View {
                         // Fade out phase
                         opacity = max(0, min(1, 2.0 - charProgress))
                     }
-                    
+
                     // Add some vertical jitter during transition based on character index
                     // Use a deterministic calculation instead of random
                     let jitter = (1.0 - abs(1.0 - charProgress)) * 2.0 // Max jitter at mid-transition
                     let jitterAmount = abs(jitter)
                     let yOffset = sin(Double(index) * 0.5 + pixelatedProgress * 3.0) * jitterAmount
-                    
+
                     let charText = Text(String(char))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(MacAmpColors.displayText.opacity(opacity))
-                    
+
                     let resolved = context.resolve(charText)
                     let charWidth = resolved.measure(in: size).width
-                    
+
                     context.draw(resolved, at: CGPoint(x: xPos, y: size.height / 2 + yOffset), anchor: .leading)
-                    
+
                     xPos += charWidth
                 }
-                
+
                 // Update animation state
                 DispatchQueue.main.async {
                     self.updatePixelatedAnimation()
@@ -3282,10 +3282,10 @@ struct AnimatedSongDisplay: View {
             }
         }
     }
-    
+
     private func updatePixelatedAnimation() {
         pixelatedProgress += 0.02
-        
+
         // When fully faded out, switch to the other text
         if pixelatedProgress >= 2.5 {
             pixelatedProgress = 0
@@ -3295,7 +3295,7 @@ struct AnimatedSongDisplay: View {
             charRandomOffsets = (0..<currentText.count).map { _ in Double.random(in: 0...0.5) }
         }
     }
-    
+
     private func updateVestaboardAnimation(fullText: String, textWidth: CGFloat, availableWidth: CGFloat) {
         switch vestaboardPhase {
         case 0: // Revealing artist
@@ -3312,7 +3312,7 @@ struct AnimatedSongDisplay: View {
                 showingTimer = 0
                 vestaboardScrollOffset = 0
             }
-            
+
         case 1: // Showing/scrolling artist
             if textWidth > availableWidth {
                 // Scroll if needed
@@ -3322,7 +3322,7 @@ struct AnimatedSongDisplay: View {
                     vestaboardScrollOffset = 0
                 }
             }
-            
+
             // Wait a bit then move to title
             showingTimer += 0.05
             if showingTimer >= 3.0 { // Show for 3 seconds
@@ -3331,7 +3331,7 @@ struct AnimatedSongDisplay: View {
                 showingTimer = 0
                 vestaboardScrollOffset = 0
             }
-            
+
         case 2: // Revealing title
             // Slowly reveal one character at a time
             if revealedChars < fullText.count {
@@ -3346,7 +3346,7 @@ struct AnimatedSongDisplay: View {
                 showingTimer = 0
                 vestaboardScrollOffset = 0
             }
-            
+
         case 3: // Showing/scrolling title
             if textWidth > availableWidth {
                 // Scroll if needed
@@ -3356,7 +3356,7 @@ struct AnimatedSongDisplay: View {
                     vestaboardScrollOffset = 0
                 }
             }
-            
+
             // Wait a bit then go back to artist
             showingTimer += 0.05
             if showingTimer >= 3.0 { // Show for 3 seconds
@@ -3365,12 +3365,12 @@ struct AnimatedSongDisplay: View {
                 showingTimer = 0
                 vestaboardScrollOffset = 0
             }
-            
+
         default:
             break
         }
     }
-    
+
     private func resetAnimation() {
         scrollOffset = 0
         vestaboardPhase = 0

@@ -42,3 +42,6 @@ fastlane/test_output
 # Code Injection
 iOSInjectionProject/
 
+# IDE & AI
+.nova
+.claude

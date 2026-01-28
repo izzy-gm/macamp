@@ -20,7 +20,7 @@ xcode-select --install
 
 1. **Open the Project**
    ```bash
-   cd /path/to/winamp
+   cd /path/to/macamp
    open MacAmp.xcodeproj
    ```
 
@@ -41,7 +41,7 @@ xcode-select --install
 ### Build Debug Version
 
 ```bash
-cd /path/to/winamp
+cd /path/to/macamp
 xcodebuild -project MacAmp.xcodeproj \
            -scheme MacAmp \
            -configuration Debug \

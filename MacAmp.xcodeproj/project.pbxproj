@@ -23,7 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A10000000 /* Winamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Winamp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000 /* Macamp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Macamp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000001 /* MacAmpApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAmpApp.swift; sourceTree = "<group>"; };
 		A20000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A20000003 /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
@@ -91,7 +91,7 @@
 		A40000004 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000 /* Winamp.app */,
+				A10000000 /* Macamp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -99,9 +99,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A50000001 /* Winamp */ = {
+		A50000001 /* Macamp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A60000001 /* Build configuration list for PBXNativeTarget "Winamp" */;
+			buildConfigurationList = A60000001 /* Build configuration list for PBXNativeTarget "Macamp" */;
 			buildPhases = (
 				A70000001 /* Sources */,
 				A30000001 /* Frameworks */,
@@ -113,7 +113,7 @@
 			);
 			name = MacAmp;
 			productName = MacAmp;
-			productReference = A10000000 /* Winamp.app */;
+			productReference = A10000000 /* Macamp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -126,7 +126,7 @@
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 			};
-			buildConfigurationList = A60000002 /* Build configuration list for PBXProject "Winamp" */;
+			buildConfigurationList = A60000002 /* Build configuration list for PBXProject "Macamp" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -138,7 +138,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A50000001 /* Winamp */,
+				A50000001 /* Macamp */,
 			);
 		};
 /* End PBXProject section */
@@ -211,7 +211,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = Resources/Winamp.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Resources/Macamp.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -250,7 +250,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.winamp.macos;
+				PRODUCT_BUNDLE_IDENTIFIER = com.macamp.macos;
 				PRODUCT_NAME = MacAmp;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -294,7 +294,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = Resources/Winamp.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Resources/Macamp.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -326,7 +326,7 @@
 				MARKETING_VERSION = 1.1.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.winamp.macos;
+				PRODUCT_BUNDLE_IDENTIFIER = com.macamp.macos;
 				PRODUCT_NAME = MacAmp;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -351,7 +351,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A60000001 /* Build configuration list for PBXNativeTarget "Winamp" */ = {
+		A60000001 /* Build configuration list for PBXNativeTarget "Macamp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A11000001 /* Debug */,
@@ -360,7 +360,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A60000002 /* Build configuration list for PBXProject "Winamp" */ = {
+		A60000002 /* Build configuration list for PBXProject "Macamp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A11000003 /* Debug */,
