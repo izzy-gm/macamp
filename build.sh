@@ -1,12 +1,12 @@
 #!/bin/bash
-# Winamp macOS Build Script
+# MacAmp Build Script
 
 set -e
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_NAME="Winamp"
+PROJECT_NAME="MacAmp"
 
-echo "🎵 Building Winamp macOS..."
+echo "🎵 Building MacAmp..."
 echo ""
 
 # Parse arguments
@@ -73,7 +73,7 @@ if [ $? -eq 0 ]; then
         # Run if requested
         if [ "$RUN_AFTER_BUILD" = true ]; then
             echo ""
-            echo "🚀 Launching Winamp..."
+            echo "🚀 Launching MacAmp..."
             open "$APP_PATH"
         fi
     fi

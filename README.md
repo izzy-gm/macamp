@@ -39,7 +39,7 @@ A native macOS music player inspired by the classic Winamp. Built with SwiftUI a
 
 ### Using Xcode
 
-1. Open `Winamp.xcodeproj` in Xcode
+1. Open `MacAmp.xcodeproj` in Xcode
 2. Select the Winamp scheme
 3. Build and run (Cmd+R)
 
